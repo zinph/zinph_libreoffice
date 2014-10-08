@@ -59,9 +59,21 @@ gb_CXXFLAGS := \
 
 # these are to get g++ to switch to Objective-C++ mode
 # (see toolkit module for a case where it is necessary to do it this way)
-gb_OBJCXXFLAGS := -x objective-c++ -fobjc-exceptions
+gb_OBJCXXFLAGS := \
+	-x objective-c++ \
+	-fobjc-exceptions \
+	$(if $(filter TRUE,$(COM_GCC_IS_CLANG)),,\
+		-fgnu-runtime \
+		-fconstant-string-class=NSConstantString \
+	)
 
-gb_OBJCFLAGS := -x objective-c -fobjc-exceptions
+gb_OBJCFLAGS := \
+	-x objective-c \
+	-fobjc-exceptions \
+	$(if $(filter TRUE,$(COM_GCC_IS_CLANG)),,\
+		-fgnu-runtime \
+		-fconstant-string-class=NSConstantString \
+	)
 
 # LinkTarget class
 

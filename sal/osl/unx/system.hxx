@@ -199,6 +199,9 @@
 #ifdef MACOSX
 #define __OPENTRANSPORTPROVIDERS__ // these are already defined
 #define TimeValue CFTimeValue      // Do not conflict with TimeValue in sal/inc/osl/time.h
+#ifndef OBJC_EXPORT
+#include <objc/objc-api.h>
+#endif
 #include <Carbon/Carbon.h>
 #undef TimeValue
 #   ifndef ETIME

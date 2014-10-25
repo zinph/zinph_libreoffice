@@ -320,12 +320,30 @@ static bool AddTempDevFont(const OUString& rFontFileURL)
     CFStringRef rFontPath = CFStringCreateWithCString(nullptr, aCFileName.getStr(), kCFStringEncodingUTF8);
     CFURLRef rFontURL = CFURLCreateWithFileSystemPath(nullptr, rFontPath, kCFURLPOSIXPathStyle, true);
 
+    bool success = false;
+
+#if MACOSX_SDK_VERSION >= 1060
     CFErrorRef error;
-    bool success = CTFontManagerRegisterFontsForURL(rFontURL, kCTFontManagerScopeProcess, &error);
+    success = CTFontManagerRegisterFontsForURL(rFontURL, kCTFontManagerScopeProcess, &error);
     if (!success)
     {
         CFRelease(error);
     }
+#else /* CTFontManagerRegisterFontsForURL is not available on OS X <10.6 */
+    CGDataProviderRef dataProvider = CGDataProviderCreateWithURL(rFontURL);
+    CGFontRef graphicsFont = CGFontCreateWithDataProvider(dataProvider);
+    if (graphicsFont)
+    {
+        CTFontRef coreTextFont = CTFontCreateWithGraphicsFont(graphicsFont, /*fontSize*/ 0, /*matrix*/ nullptr, /*attributes*/ nullptr);
+        if (coreTextFont)
+        {
+            success = true;
+            CFRelease(coreTextFont);
+        }
+        CGFontRelease(graphicsFont);
+    }
+    CGDataProviderRelease(dataProvider);
+#endif
 
     return success;
 }

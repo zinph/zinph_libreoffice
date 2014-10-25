@@ -321,7 +321,7 @@ uno::Sequence<rtl::OUString> SAL_CALL SalAquaFilePicker::getSelectedFiles() thro
 
     SolarMutexGuard aGuard;
 
-#if HAVE_FEATURE_MACOSX_SANDBOX
+#if MACOSX_SDK_VERSION >= 1070 && HAVE_FEATURE_MACOSX_SANDBOX
     static NSUserDefaults *userDefaults;
     static bool triedUserDefaults = false;
 
@@ -350,7 +350,7 @@ uno::Sequence<rtl::OUString> SAL_CALL SalAquaFilePicker::getSelectedFiles() thro
     {
         NSURL *url = [files objectAtIndex:nIndex];
 
-#if HAVE_FEATURE_MACOSX_SANDBOX
+#if MACOSX_SDK_VERSION >= 1070 && HAVE_FEATURE_MACOSX_SANDBOX
         if (userDefaults != NULL &&
             [url respondsToSelector:@selector(bookmarkDataWithOptions:includingResourceValuesForKeys:relativeToURL:error:)])
         {
@@ -765,7 +765,11 @@ void SalAquaFilePicker::updateSaveFileNameExtension() {
         rtl::OUString suffix = (*(aStringList.begin())).copy(1);
         NSString *requiredFileType = [NSString stringWithOUString:suffix];
 
+#if MACOSX_SDK_VERSION < 1060
+        [m_pDialog setRequiredFileType:requiredFileType];
+#else
         [m_pDialog setAllowedFileTypes:[NSArray arrayWithObjects:requiredFileType, nil]];
+#endif
 
         OSL_TRACE("disallowing other file types");
         [m_pDialog setAllowsOtherFileTypes:NO];

@@ -47,6 +47,11 @@
 #include <Carbon/Carbon.h>
 #include "postmac.h"
 
+#if MACOSX_SDK_VERSION < 1060
+#include "vcl/timer.hxx"
+#include "osx/saltimer.h"
+#endif
+
 using namespace std;
 
 AquaSalFrame* AquaSalFrame::s_pCaptureFrame = nullptr;
@@ -202,7 +207,11 @@ void AquaSalFrame::initWindowAndView()
         [mpNSWindow setAcceptsMouseMovedEvents: YES];
     [mpNSWindow setHasShadow: YES];
 
+#if MACOSX_SDK_VERSION < 1060
+    objc_msgSend(mpNSWindow, @selector(setDelegate:), mpNSWindow);
+#else
     [mpNSWindow setDelegate: static_cast<id<NSWindowDelegate> >(mpNSWindow)];
+#endif
 
     if( [mpNSWindow respondsToSelector: @selector(setRestorable:)])
     {
@@ -766,6 +775,27 @@ void AquaSalFrame::ShowFullScreen( bool bFullScreen, sal_Int32 nDisplay )
         SendPaintEvent();
 }
 
+#if MACOSX_SDK_VERSION < 1060
+class PreventSleepTimer : public AutoTimer
+{
+public:
+    PreventSleepTimer()
+    {
+        SetTimeout( 30000 );
+        Start();
+    }
+
+    virtual ~PreventSleepTimer()
+    {
+    }
+
+    virtual void Timeout()
+    {
+        UpdateSystemActivity(OverallAct);
+    }
+};
+#endif
+
 void AquaSalFrame::StartPresentation( bool bStart )
 {
     if ( !mpNSWindow )
@@ -777,10 +807,14 @@ void AquaSalFrame::StartPresentation( bool bStart )
     if( bStart )
     {
         GetSalData()->maPresentationFrames.push_back( this );
+#if MACOSX_SDK_VERSION < 1060
+        mpActivityTimer.reset( new PreventSleepTimer() );
+#else
         IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep,
                                     kIOPMAssertionLevelOn,
                                     CFSTR("LibreOffice presentation running"),
                                     &mnAssertionID);
+#endif
         [mpNSWindow setLevel: NSPopUpMenuWindowLevel];
         if( mbShown )
             [mpNSWindow makeMainWindow];
@@ -788,7 +822,11 @@ void AquaSalFrame::StartPresentation( bool bStart )
     else
     {
         GetSalData()->maPresentationFrames.remove( this );
+#if MACOSX_SDK_VERSION < 1060
+        mpActivityTimer.reset();
+#else
         IOPMAssertionRelease(mnAssertionID);
+#endif
         [mpNSWindow setLevel: NSNormalWindowLevel];
     }
 }

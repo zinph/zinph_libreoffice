@@ -481,7 +481,7 @@ static AquaSalFrame* getMouseContainerFrame()
         mpFrame = pFrame;
         mMarkedRange = NSMakeRange(NSNotFound, 0);
         mSelectedRange = NSMakeRange(NSNotFound, 0);
-        mpReferenceWrapper = nil;
+        mpReferenceWrapper = reinterpret_cast<ReferenceWrapper*>(nil);
         mpMouseEventListener = nil;
         mpLastSuperEvent = nil;
     }
@@ -1788,7 +1788,7 @@ private:
         // some frames never become visible ..
         vcl::Window *pWindow = mpFrame -> GetWindow();
         if ( ! pWindow )
-            return nil;
+            return reinterpret_cast<::com::sun::star::accessibility::XAccessibleContext*>(nil);
 
         mpReferenceWrapper = new ReferenceWrapper;
         mpReferenceWrapper -> rAccessibleContext =  pWindow -> /*GetAccessibleChildWindow( 0 ) ->*/ GetAccessible() -> getAccessibleContext();

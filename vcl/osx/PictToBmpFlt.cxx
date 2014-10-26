@@ -18,6 +18,9 @@
  */
 
 #include <premac.h>
+#ifndef OBJC_EXPORT
+#include <objc/objc-api.h>
+#endif
 #include <Carbon/Carbon.h>
 #include <QuickTime/QuickTime.h>
 #include <postmac.h>

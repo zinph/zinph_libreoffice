@@ -21,6 +21,9 @@
 #define INCLUDED_FPICKER_SOURCE_AQUA_NSSTRING_OOOADDITIONS_HXX
 
 #include <premac.h>
+#ifndef OBJC_EXPORT
+#include <objc/objc-api.h>
+#endif
 #import <Cocoa/Cocoa.h>
 #include <postmac.h>
 #include <rtl/ustring.hxx>

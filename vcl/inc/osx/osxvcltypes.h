@@ -21,6 +21,9 @@
 #define INCLUDED_VCL_INC_OSX_OSXVCLTYPES_H
 
 #include "premac.h"
+#ifndef OBJC_EXPORT
+#include <objc/objc-api.h>
+#endif
 #import <Cocoa/Cocoa.h>
 #import <AppKit/NSEvent.h>
 #include "postmac.h"

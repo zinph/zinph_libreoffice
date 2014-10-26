@@ -22,6 +22,9 @@
 
 #if defined ( MACOSX )
 #include "premac.h"
+#ifndef OBJC_EXPORT
+#include <objc/objc-api.h>
+#endif
 #include <Cocoa/Cocoa.h>
 #include "postmac.h"
 #endif

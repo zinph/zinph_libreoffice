@@ -20,6 +20,10 @@
 #ifndef INCLUDED_VCL_INC_OSX_A11YFACTORY_H
 #define INCLUDED_VCL_INC_OSX_A11YFACTORY_H
 
+#ifndef OBJC_EXPORT
+#include <objc/objc-api.h>
+#endif
+
 #include "osxvcltypes.h"
 #include "a11ywrapper.h"
 #include <com/sun/star/accessibility/XAccessibleContext.hpp>

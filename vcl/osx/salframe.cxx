@@ -41,6 +41,9 @@
 #include "salwtype.hxx"
 
 #include "premac.h"
+#ifndef OBJC_EXPORT
+#include <objc/objc-api.h>
+#endif
 #include <objc/objc-runtime.h>
 // needed for theming
 // FIXME: move theming code to salnativewidgets.cxx

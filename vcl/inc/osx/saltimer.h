@@ -21,6 +21,9 @@
 #define INCLUDED_VCL_INC_OSX_SALTIMER_H
 
 #include "premac.h"
+#ifndef OBJC_EXPORT
+#include <objc/objc-api.h>
+#endif
 #include <Cocoa/Cocoa.h>
 #include "postmac.h"
 

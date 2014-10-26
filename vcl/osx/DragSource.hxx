@@ -33,6 +33,9 @@
 #include <boost/noncopyable.hpp>
 
 #include <premac.h>
+#ifndef OBJC_EXPORT
+#include <objc/objc-api.h>
+#endif
 #import <Cocoa/Cocoa.h>
 #include <postmac.h>
 

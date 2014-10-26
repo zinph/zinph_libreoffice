@@ -21,6 +21,9 @@
 #define INCLUDED_FPICKER_SOURCE_AQUA_CFSTRINGUTILITIES_HXX
 
 #include <premac.h>
+#ifndef OBJC_EXPORT
+#include <objc/objc-api.h>
+#endif
 #include <Carbon/Carbon.h>
 #include <Cocoa/Cocoa.h>
 #include <postmac.h>

@@ -27,6 +27,9 @@
 #include <osl/thread.hxx>
 
 #ifdef MACOSX
+#ifndef OBJC_EXPORT
+#include <objc/objc-api.h>
+#endif
 #include "osx/osxvcltypes.h"
 #endif
 #include "salinst.hxx"

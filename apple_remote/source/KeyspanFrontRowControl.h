@@ -29,6 +29,9 @@
  *
  *****************************************************************************/
 
+#ifndef OBJC_EXPORT
+#include <objc/objc-api.h>
+#endif
 #import <Cocoa/Cocoa.h>
 
 #import "HIDRemoteControlDevice.h"

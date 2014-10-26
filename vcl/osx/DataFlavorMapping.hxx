@@ -26,6 +26,9 @@
 #include <com/sun/star/lang/XMultiComponentFactory.hpp>
 
 #include <premac.h>
+#ifndef OBJC_EXPORT
+#include <objc/objc-api.h>
+#endif
 #import <Cocoa/Cocoa.h>
 #include <postmac.h>
 

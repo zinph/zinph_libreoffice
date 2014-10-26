@@ -23,6 +23,9 @@
 #include <iostream>
 
 #include <premac.h>
+#ifndef OBJC_EXPORT
+#include <objc/objc-api.h>
+#endif
 #include <CoreFoundation/CoreFoundation.h>
 #include <Foundation/Foundation.h>
 #ifdef MACOSX

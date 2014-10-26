@@ -21,6 +21,9 @@
 #define INCLUDED_AVMEDIA_SOURCE_QUICKTIME_QUICKTIMECOMMON_HXX
 
 #ifdef MACOSX
+#ifndef OBJC_EXPORT
+#include <objc/objc-api.h>
+#endif
 #include <premac.h>
 #import <Cocoa/Cocoa.h>
 #import <QTKit/QTKit.h>

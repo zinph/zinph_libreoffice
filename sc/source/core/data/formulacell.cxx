@@ -54,7 +54,9 @@
 #include "types.hxx"
 #include "scopetools.hxx"
 #include "refupdatecontext.hxx"
+#if defined(HAVE_FEATURE_OPENCL) && HAVE_FEATURE_OPENCL
 #include <opencl/openclwrapper.hxx>
+#endif
 #include <tokenstringcontext.hxx>
 #include <refhint.hxx>
 #include <listenerquery.hxx>

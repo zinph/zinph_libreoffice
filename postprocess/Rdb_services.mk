@@ -131,7 +131,7 @@ $(eval $(call gb_Rdb_add_components,services,\
 		$(if $(filter TRUE,$(ENABLE_MACOSX_SANDBOX)),, \
 			$(call gb_Helper_optional,AVMEDIA,avmedia/source/quicktime/avmediaQuickTime) \
 		) \
-		lingucomponent/source/spellcheck/macosxspell/MacOSXSpell \
+		$(if $(filter-out 1050,$(MACOSX_SDK_VERSION)),lingucomponent/source/spellcheck/macosxspell/MacOSXSpell) \
 		fpicker/source/aqua/fps_aqua \
 		shell/source/backends/macbe/macbe1 \
 		vcl/vcl.macosx \

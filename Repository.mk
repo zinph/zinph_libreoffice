@@ -432,7 +432,7 @@ $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,ooo, \
 			AppleRemote \
 		) \
 		fps_aqua \
-		MacOSXSpell \
+		$(if $(filter-out 1050,$(MACOSX_SDK_VERSION)),MacOSXSpell) \
 	) \
 ))
 

@@ -273,7 +273,7 @@ sub setglobalvariables
         }
     }
 
-    if ( $installer::globals::platformid eq 'macosx_x86_64')
+    if ( $installer::globals::os eq 'MACOSX')
     {
         $installer::globals::ismacbuild = 1;
 

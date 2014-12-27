@@ -60,6 +60,7 @@
 #define PLATFORM_FREEBSD_X86_64     "freebsd_x86_64"
 #define PLATFORM_NETBSD_X86         "netbsd_x86"
 #define PLATFORM_NETBSD_X86_64      "netbsd_x86_64"
+#define PLATFORM_MACOSX_POWERPC     "macosx_powerpc"
 #define PLATFORM_MACOSX_X86         "macosx_x86"
 #define PLATFORM_MACOSX_X86_64      "macosx_x86_64"
 #define PLATFORM_OPENBSD_X86        "openbsd_x86"
@@ -178,6 +179,8 @@ namespace
             ret = checkOSandCPU("NetBSD", "x86");
         else if (token == PLATFORM_NETBSD_X86_64)
             ret = checkOSandCPU("NetBSD", "X86_64");
+        else if (token == PLATFORM_MACOSX_POWERPC)
+            ret = checkOSandCPU("MacOSX", "PowerPC");
         else if (token == PLATFORM_MACOSX_X86)
             ret = checkOSandCPU("MacOSX", "x86");
         else if (token == PLATFORM_MACOSX_X86_64)

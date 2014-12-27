@@ -576,7 +576,7 @@ sub resolve_variables_in_downloadname
     elsif ( $installer::globals::issolarissparcbuild ) { $os = "solsparc"; }
     elsif ( $installer::globals::issolarisx86build ) { $os = "solia"; }
     elsif ( $installer::globals::islinuxbuild ) { $os = "linux"; }
-    elsif ( $installer::globals::platformid eq 'macosx_x86_64' ) { $os = "macosxx"; }
+    elsif ( $installer::globals::os eq 'MACOSX' ) { $os = "macosx"; }
     else { $os = ""; }
     $downloadname =~ s/\{os\}/$os/;
 

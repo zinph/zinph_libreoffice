@@ -2232,6 +2232,32 @@ class QueryEvaluator
         return (rEntry.eOp == SC_LESS_EQUAL || rEntry.eOp == SC_GREATER_EQUAL);
     }
 
+    // non-negligable cost of doing this work if we don't need to.
+
+    utl::TransliterationWrapper* getTransliteration()
+    {
+        if (!mpTransliteration)
+        {
+            if (mrParam.bCaseSens)
+                mpTransliteration = ScGlobal::GetCaseTransliteration();
+            else
+                mpTransliteration = ScGlobal::GetpTransliteration();
+        }
+        return mpTransliteration;
+    }
+
+    CollatorWrapper* getCollator()
+    {
+        if (!mpCollator)
+        {
+            if (mrParam.bCaseSens)
+                mpCollator = ScGlobal::GetCaseCollator();
+            else
+                mpCollator = ScGlobal::GetCollator();
+        }
+        return mpCollator;
+    }
+
 public:
     QueryEvaluator(ScDocument& rDoc, const ScTable& rTab, const ScQueryParam& rParam,
                    const bool* pTestEqualCondition) :
@@ -2240,18 +2266,10 @@ public:
         mrTab(rTab),
         mrParam(rParam),
         mpTestEqualCondition(pTestEqualCondition),
+        mpTransliteration(NULL),
+        mpCollator(NULL),
         mbMatchWholeCell(rDoc.GetDocOptions().IsMatchWholeCell())
     {
-        if (rParam.bCaseSens)
-        {
-            mpTransliteration = ScGlobal::GetCaseTransliteration();
-            mpCollator = ScGlobal::GetCaseCollator();
-        }
-        else
-        {
-            mpTransliteration = ScGlobal::GetpTransliteration();
-            mpCollator = ScGlobal::GetCollator();
-        }
     }
 
     bool isQueryByValue(
@@ -2493,10 +2511,11 @@ public:
                 else
                 {
                     OUString aQueryStr = rItem.maString.getString();
-                    OUString aCell( mpTransliteration->transliterate(
+                    utl::TransliterationWrapper *pTransliteration = getTransliteration();
+                    OUString aCell( pTransliteration->transliterate(
                         aCellStr.getString(), ScGlobal::eLnge, 0, aCellStr.getLength(),
                         NULL ) );
-                    OUString aQuer( mpTransliteration->transliterate(
+                    OUString aQuer( pTransliteration->transliterate(
                         aQueryStr, ScGlobal::eLnge, 0, aQueryStr.getLength(),
                         NULL ) );
                     sal_Int32 nIndex = (rEntry.eOp == SC_ENDS_WITH || rEntry.eOp == SC_DOES_NOT_END_WITH) ?
@@ -2533,7 +2552,7 @@ public:
             }
             else
             {   // use collator here because data was probably sorted
-                sal_Int32 nCompare = mpCollator->compareString(
+                sal_Int32 nCompare = getCollator()->compareString(
                     aCellStr.getString(), rItem.maString.getString());
                 switch (rEntry.eOp)
                 {

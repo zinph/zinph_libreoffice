@@ -112,7 +112,6 @@ struct SC_DLLPUBLIC ScRefCellValue
     ScRefCellValue( const EditTextObject* pEditText );
     ScRefCellValue( ScFormulaCell* pFormula );
     ScRefCellValue( const ScRefCellValue& r );
-    ~ScRefCellValue();
 
     void clear();
 
@@ -143,15 +142,24 @@ struct SC_DLLPUBLIC ScRefCellValue
      */
     OUString getString( const ScDocument* pDoc );
 
-    bool isEmpty() const;
-
     bool hasEmptyValue();
 
     bool equalsWithoutFormat( const ScRefCellValue& r ) const;
 
-    ScRefCellValue& operator= ( const ScRefCellValue& r );
-
     void swap( ScRefCellValue& r );
+
+    // Called extremely frequently by query iterators
+
+    inline bool isEmpty() const { return meType == CELLTYPE_NONE; }
+
+    inline ScRefCellValue& operator= ( const ScRefCellValue& r )
+    {
+        // double is 8 bytes, whereas a pointer may be 4 or 8 bytes
+        // depending on the platform. So assign double value.
+        meType = r.meType;
+        mfValue = r.mfValue;
+        return *this;
+    }
 };
 
 #endif

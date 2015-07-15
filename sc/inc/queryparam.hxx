@@ -50,9 +50,10 @@ struct ScQueryParamBase
 
     virtual bool IsValidFieldIndex() const;
 
-    SC_DLLPUBLIC SCSIZE GetEntryCount() const;
-    SC_DLLPUBLIC const ScQueryEntry& GetEntry(SCSIZE n) const;
-    SC_DLLPUBLIC ScQueryEntry& GetEntry(SCSIZE n);
+    inline SCSIZE GetEntryCount() const                 { return maEntries.size(); }
+    inline const ScQueryEntry& GetEntry(SCSIZE n) const { return maEntries[n]; }
+    inline ScQueryEntry& GetEntry(SCSIZE n)             { return maEntries[n]; }
+
     SC_DLLPUBLIC ScQueryEntry& AppendEntry();
     ScQueryEntry* FindEntryByField(SCCOLROW nField, bool bNew);
     SC_DLLPUBLIC void RemoveEntryByField(SCCOLROW nField);

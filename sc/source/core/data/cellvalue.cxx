@@ -518,11 +518,6 @@ ScRefCellValue::ScRefCellValue( ScFormulaCell* pFormula ) : meType(CELLTYPE_FORM
 // as the pointer values.
 ScRefCellValue::ScRefCellValue( const ScRefCellValue& r ) : meType(r.meType), mfValue(r.mfValue) {}
 
-ScRefCellValue::~ScRefCellValue()
-{
-    clear();
-}
-
 void ScRefCellValue::clear()
 {
     // Reset to empty value.
@@ -589,11 +584,6 @@ OUString ScRefCellValue::getString( const ScDocument* pDoc )
     return getStringImpl(*this, pDoc);
 }
 
-bool ScRefCellValue::isEmpty() const
-{
-    return meType == CELLTYPE_NONE;
-}
-
 bool ScRefCellValue::hasEmptyValue()
 {
     if (isEmpty())
@@ -608,13 +598,6 @@ bool ScRefCellValue::hasEmptyValue()
 bool ScRefCellValue::equalsWithoutFormat( const ScRefCellValue& r ) const
 {
     return equalsWithoutFormatImpl(*this, r);
-}
-
-ScRefCellValue& ScRefCellValue::operator= ( const ScRefCellValue& r )
-{
-    ScRefCellValue aTmp(r);
-    swap(aTmp);
-    return *this;
 }
 
 void ScRefCellValue::swap( ScRefCellValue& r )

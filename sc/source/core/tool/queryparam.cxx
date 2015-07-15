@@ -89,21 +89,6 @@ bool ScQueryParamBase::IsValidFieldIndex() const
     return true;
 }
 
-SCSIZE ScQueryParamBase::GetEntryCount() const
-{
-    return maEntries.size();
-}
-
-const ScQueryEntry& ScQueryParamBase::GetEntry(SCSIZE n) const
-{
-    return maEntries[n];
-}
-
-ScQueryEntry& ScQueryParamBase::GetEntry(SCSIZE n)
-{
-    return maEntries[n];
-}
-
 ScQueryEntry& ScQueryParamBase::AppendEntry()
 {
     // Find the first unused entry.

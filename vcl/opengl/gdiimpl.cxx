@@ -173,8 +173,8 @@ void OpenGLSalGraphicsImpl::PreDraw()
 
 void OpenGLSalGraphicsImpl::PostDraw()
 {
-    if( !mbOffscreen && mpContext->mnPainting == 0 )
-        glFlush();
+    //if( !mbOffscreen && mpContext->mnPainting == 0 )
+    //    glFlush();
     if( mbUseScissor )
         glDisable( GL_SCISSOR_TEST );
     if( mbUseStencil )
@@ -1828,7 +1828,7 @@ void OpenGLSalGraphicsImpl::endPaint()
     {
         mpContext->makeCurrent();
         mpContext->AcquireDefaultFramebuffer();
-        glFlush();
+        //glFlush();
         mpContext->swapBuffers();
     }
 

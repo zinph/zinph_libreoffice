@@ -175,10 +175,9 @@ void OpenGLSalGraphicsImpl::PostDraw()
 {
     //if( !mbOffscreen && mpContext->mnPainting == 0 )
     //    glFlush();
-    if( mbUseScissor )
-        glDisable( GL_SCISSOR_TEST );
     if( mbUseStencil )
         glDisable( GL_STENCIL_TEST );
+
     if( mpProgram )
     {
         mpProgram->Clean();
@@ -247,9 +246,6 @@ void OpenGLSalGraphicsImpl::ImplInitClipRegion()
             ImplSetClipBit( maClipRegion, 0x01 );
         }
     }
-
-    if( mbUseScissor )
-        glEnable( GL_SCISSOR_TEST );
     if( mbUseStencil )
     {
         glStencilFunc( GL_EQUAL, 1, 0x1 );

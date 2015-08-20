@@ -175,8 +175,6 @@ void OpenGLSalGraphicsImpl::PostDraw()
 {
     //if( !mbOffscreen && mpContext->mnPainting == 0 )
     //    glFlush();
-    if( mbUseStencil )
-        glDisable( GL_STENCIL_TEST );
 
     if( mpProgram )
     {
@@ -245,11 +243,6 @@ void OpenGLSalGraphicsImpl::ImplInitClipRegion()
         {
             ImplSetClipBit( maClipRegion, 0x01 );
         }
-    }
-    if( mbUseStencil )
-    {
-        glStencilFunc( GL_EQUAL, 1, 0x1 );
-        glEnable( GL_STENCIL_TEST );
     }
 
     CHECK_GL_ERROR();

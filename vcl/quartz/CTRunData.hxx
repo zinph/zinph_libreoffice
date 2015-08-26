@@ -10,8 +10,20 @@
 #define CTRunData_Included
 
 #include "premac.h"
+#if defined(MACOSX) && MACOSX_SDK_VERSION < 1080
+#include <ApplicationServices/ApplicationServices.h>
+#if MACOSX_SDK_VERSION < 1060
+// The following symbols are SPI (System Programming Interface) in 10.5
+extern "C" {
+    void CTRunGetAdvances(CTRunRef run, CFRange range, CGSize buffer[]);
+    const CGSize* CTRunGetAdvancesPtr(CTRunRef run);
+    extern const CFStringRef kCTTypesetterOptionForcedEmbeddingLevel;
+}
+#endif
+#else
 #include <CoreGraphics/CoreGraphics.h>
 #include <CoreText/CoreText.h>
+#endif
 #include "postmac.h"
 
 class CTRunData

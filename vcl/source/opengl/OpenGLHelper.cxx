@@ -608,4 +608,13 @@ GLXFBConfig OpenGLHelper::GetPixmapFBConfig( Display* pDisplay, bool& bInverted 
 
 #endif
 
+void OpenGLHelper::flush()
+{
+    if (!isVCLOpenGLEnabled())
+        return;
+
+    glFlush();
+    CHECK_GL_ERROR();
+}
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

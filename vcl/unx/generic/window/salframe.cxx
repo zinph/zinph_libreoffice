@@ -35,7 +35,6 @@
 #include "vcl/settings.hxx"
 #include "vcl/bmpacc.hxx"
 #include "vcl/opengl/OpenGLContext.hxx"
-#include "vcl/opengl/OpenGLHelper.hxx"
 
 #include <prex.h>
 #include <X11/Xatom.h>
@@ -2453,13 +2452,11 @@ void X11SalFrame::SetTitle( const OUString& rTitle )
 void X11SalFrame::Flush()
 {
     XFlush( GetDisplay()->GetDisplay() );
-    OpenGLHelper::flush();
 }
 
 void X11SalFrame::Sync()
 {
     XSync( GetDisplay()->GetDisplay(), False );
-    OpenGLHelper::flush();
 }
 
 // Keyboard

@@ -355,6 +355,7 @@ $(eval $(foreach method,\
 	add_cxxobject \
 	add_cxxobjects \
 	add_exception_objects \
+	add_objcxxflags_exception_objects \
 	use_executable_objects \
 	use_library_objects \
 	use_libraries \

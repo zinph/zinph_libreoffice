@@ -20,6 +20,7 @@
 #include <sal/config.h>
 
 #include <cassert>
+#include <cstdlib>
 
 #include "formulacell.hxx"
 #include "grouptokenconverter.hxx"
@@ -3770,6 +3771,36 @@ ScFormulaCell::CompareState ScFormulaCell::CompareByTokenArray( ScFormulaCell& r
     return bInvariant ? EqualInvariant : EqualRelativeRef;
 }
 
+namespace {
+
+// Split N into optimally equal-sized pieces, each not larger than K.
+// Return value P is number of pieces. A returns the number of pieces
+// one larger than N/P, 0..P-1.
+
+int splitup(int N, int K, int& A)
+{
+    assert(N > 0);
+    assert(K > 0);
+
+    A = 0;
+
+    if (N <= K)
+        return 1;
+
+    const int ideal_num_parts = N / K;
+    if (ideal_num_parts * K == N)
+        return ideal_num_parts;
+
+    const int num_parts = ideal_num_parts + 1;
+    const int nominal_part_size = N / num_parts;
+
+    A = N - num_parts * nominal_part_size;
+
+    return num_parts;
+}
+
+} // anonymous namespace
+
 bool ScFormulaCell::InterpretFormulaGroup()
 {
     if (!officecfg::Office::Common::Misc::UseOpenCL::get())
@@ -3805,30 +3836,84 @@ bool ScFormulaCell::InterpretFormulaGroup()
     if (mxGroup->mbInvariant && false)
         return InterpretInvariantFormulaGroup();
 
-    ScTokenArray aCode;
-    ScAddress aTopPos = aPos;
-    aTopPos.SetRow(mxGroup->mpTopCell->aPos.Row());
-    ScGroupTokenConverter aConverter(aCode, *pDocument, *this, mxGroup->mpTopCell->aPos);
-    std::vector<ScTokenArray*> aLoopControl;
-    if (!aConverter.convert(*pCode, aLoopControl))
+    // Should obviously be based on some heuristics based on the kind
+    // of OpenCL device or some of its properties.
+    const int MAXGROUPLENGTH = (std::getenv("MAXGROUPLENGTH") ? std::atoi(std::getenv("MAXGROUPLENGTH")) : 1000);
+
+    int nNumOnePlus;
+    const int nNumParts = splitup(GetSharedLength(), MAXGROUPLENGTH, nNumOnePlus);
+
+    int nOffset = 0;
+    int nCurChunkSize;
+    ScAddress aOrigPos = mxGroup->mpTopCell->aPos;
+    for (int i = 0; i < nNumParts; i++, nOffset += nCurChunkSize)
     {
-        SAL_INFO("sc.opencl", "conversion of group " << this << " failed, disabling");
-        mxGroup->meCalcState = sc::GroupCalcDisabled;
-        return false;
+        nCurChunkSize = GetSharedLength()/nNumParts + (i < nNumOnePlus ? 1 : 0);
+
+        ScFormulaCellGroupRef xGroup;
+
+        if (nNumParts == 1)
+            xGroup = mxGroup;
+        else
+        {
+            // Possibly incorrect hack
+            xGroup = new ScFormulaCellGroup();
+            xGroup->mpTopCell = mxGroup->mpTopCell;
+            xGroup->mpTopCell->aPos = aOrigPos;
+            xGroup->mpTopCell->aPos.IncRow(nOffset);
+            xGroup->mbInvariant = mxGroup->mbInvariant;
+            xGroup->mnLength = nCurChunkSize;
+            xGroup->mpCode = mxGroup->mpCode;
+        }
+
+        ScTokenArray aCode;
+        ScGroupTokenConverter aConverter(aCode, *pDocument, *this, xGroup->mpTopCell->aPos);
+        std::vector<ScTokenArray*> aLoopControl;
+        if (!aConverter.convert(*pCode, aLoopControl))
+        {
+            SAL_INFO("sc.opencl", "conversion of group " << this << " failed, disabling");
+            mxGroup->meCalcState = sc::GroupCalcDisabled;
+
+            // Undo the hack above
+            if (nNumParts > 1)
+            {
+                mxGroup->mpTopCell->aPos = aOrigPos;
+                xGroup->mpTopCell = NULL;
+                xGroup->mpCode = NULL;
+            }
+
+            return false;
+        }
+
+        // The converted code does not have RPN tokens yet.  The interpreter will
+        // generate them.
+        xGroup->meCalcState = mxGroup->meCalcState = sc::GroupCalcRunning;
+        sc::FormulaGroupInterpreter *pInterpreter = sc::FormulaGroupInterpreter::getStatic();
+        if (pInterpreter == NULL ||
+            !pInterpreter->interpret(*pDocument, xGroup->mpTopCell->aPos, xGroup, aCode))
+        {
+            SAL_INFO("sc.opencl", "interpreting group " << mxGroup << " (state " << (int) mxGroup->meCalcState << ") failed, disabling");
+            mxGroup->meCalcState = sc::GroupCalcDisabled;
+
+            // Undo the hack above
+            if (nNumParts > 1)
+            {
+                mxGroup->mpTopCell->aPos = aOrigPos;
+                xGroup->mpTopCell = NULL;
+                xGroup->mpCode = NULL;
+            }
+
+            return false;
+        }
+        if (nNumParts > 1)
+        {
+            xGroup->mpTopCell = NULL;
+            xGroup->mpCode = NULL;
+        }
     }
 
-    // The converted code does not have RPN tokens yet.  The interpreter will
-    // generate them.
-    mxGroup->meCalcState = sc::GroupCalcRunning;
-    sc::FormulaGroupInterpreter *pInterpreter = sc::FormulaGroupInterpreter::getStatic();
-    if (pInterpreter == NULL ||
-        !pInterpreter->interpret(*pDocument, mxGroup->mpTopCell->aPos, mxGroup, aCode))
-    {
-        SAL_INFO("sc.opencl", "interpreting group " << mxGroup << " (state " << (int) mxGroup->meCalcState << ") failed, disabling");
-        mxGroup->meCalcState = sc::GroupCalcDisabled;
-        return false;
-    }
-
+    if (nNumParts > 1)
+        mxGroup->mpTopCell->aPos = aOrigPos;
     mxGroup->meCalcState = sc::GroupCalcEnabled;
     return true;
 }

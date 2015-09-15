@@ -3837,14 +3837,13 @@ bool ScFormulaCell::InterpretFormulaGroup()
     if (mxGroup->mbInvariant && false)
         return InterpretInvariantFormulaGroup();
 
-    // Should obviously be based on some heuristics based on the kind
-    // of OpenCL device or some of its properties.
     int nMaxGroupLength = INT_MAX;
 
 #ifdef WNT
     // Heuristic: Certain old low-end OpenCL implementations don't
     // work for us with too large group lengths. 1000 was determined
-    // empirically to be a good compromise.
+    // empirically to be a good compromise. Looking at the preferred
+    // float vector width seems to be a way to detect these devices.
     if (opencl::gpuEnv.mnPreferredVectorWidthFloat == 4)
         nMaxGroupLength = 1000;
 #endif

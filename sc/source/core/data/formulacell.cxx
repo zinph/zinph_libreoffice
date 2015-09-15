@@ -55,6 +55,7 @@
 #include "types.hxx"
 #include "scopetools.hxx"
 #include "refupdatecontext.hxx"
+#include <opencl/openclwrapper.hxx>
 #include <tokenstringcontext.hxx>
 #include <refhint.hxx>
 #include <listenerquery.hxx>
@@ -3838,10 +3839,21 @@ bool ScFormulaCell::InterpretFormulaGroup()
 
     // Should obviously be based on some heuristics based on the kind
     // of OpenCL device or some of its properties.
-    const int MAXGROUPLENGTH = (std::getenv("MAXGROUPLENGTH") ? std::atoi(std::getenv("MAXGROUPLENGTH")) : 1000);
+    int nMaxGroupLength = INT_MAX;
+
+#ifdef WNT
+    // Heuristic: Certain old low-end OpenCL implementations don't
+    // work for us with too large group lengths. 1000 was determined
+    // empirically to be a good compromise.
+    if (opencl::gpuEnv.mnPreferredVectorWidthFloat == 4)
+        nMaxGroupLength = 1000;
+#endif
+
+    if (std::getenv("SC_MAX_GROUP_LENGTH"))
+        nMaxGroupLength = std::atoi(std::getenv("SC_MAX_GROUP_LENGTH"));
 
     int nNumOnePlus;
-    const int nNumParts = splitup(GetSharedLength(), MAXGROUPLENGTH, nNumOnePlus);
+    const int nNumParts = splitup(GetSharedLength(), nMaxGroupLength, nNumOnePlus);
 
     int nOffset = 0;
     int nCurChunkSize;
@@ -3856,7 +3868,7 @@ bool ScFormulaCell::InterpretFormulaGroup()
             xGroup = mxGroup;
         else
         {
-            // Possibly incorrect hack
+            // Ugly hack
             xGroup = new ScFormulaCellGroup();
             xGroup->mpTopCell = mxGroup->mpTopCell;
             xGroup->mpTopCell->aPos = aOrigPos;

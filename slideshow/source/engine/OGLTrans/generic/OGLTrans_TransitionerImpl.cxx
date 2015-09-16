@@ -1324,6 +1324,8 @@ void OGLTransitionerImpl::impl_dispose()
 {
     impl_finishTransition();
     disposeTextures();
+    if( mpContext.is() )
+        mpContext->dispose();
     mpContext.clear();
 }
 

@@ -1306,7 +1306,7 @@ void ScTokenArray::CheckToken( const FormulaToken& r )
 
     if (SC_OPCODE_START_FUNCTION <= eOp && eOp < SC_OPCODE_STOP_FUNCTION)
     {
-        if (ScInterpreter::GetGlobalConfig().mbOpenCLSubsetOnly && ScInterpreter::GetGlobalConfig().maOpenCLSubsetOpCodes.find(eOp) == ScInterpreter::GetGlobalConfig().maOpenCLSubsetOpCodes.end())
+        if (ScInterpreter::GetGlobalConfig().mbOpenCLSubsetOnly && ScInterpreter::GetGlobalConfig().mpOpenCLSubsetOpCodes->find(eOp) == ScInterpreter::GetGlobalConfig().mpOpenCLSubsetOpCodes->end())
         {
             meVectorState = FormulaVectorDisabled;
             return;
@@ -1547,7 +1547,7 @@ void ScTokenArray::CheckToken( const FormulaToken& r )
     if (eOp >= SC_OPCODE_START_BIN_OP &&
         eOp <= SC_OPCODE_STOP_UN_OP &&
         ScInterpreter::GetGlobalConfig().mbOpenCLSubsetOnly &&
-        ScInterpreter::GetGlobalConfig().maOpenCLSubsetOpCodes.find(eOp) == ScInterpreter::GetGlobalConfig().maOpenCLSubsetOpCodes.end())
+        ScInterpreter::GetGlobalConfig().mpOpenCLSubsetOpCodes->find(eOp) == ScInterpreter::GetGlobalConfig().mpOpenCLSubsetOpCodes->end())
     {
         meVectorState = FormulaVectorDisabled;
         return;

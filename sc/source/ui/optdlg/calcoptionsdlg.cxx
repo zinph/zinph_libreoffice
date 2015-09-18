@@ -111,7 +111,7 @@ ScCalcOptionsDialog::ScCalcOptionsDialog(vcl::Window* pParent, const ScCalcConfi
     mpSpinButton->SetModifyHdl(LINK(this, ScCalcOptionsDialog, SpinOpenCLMinSizeHdl));
 
     get(mpEditField, "entry");
-    mpEditField->SetText(ScOpCodeSetToSymbolicString(maConfig.maOpenCLSubsetOpCodes));
+    mpEditField->SetText(ScOpCodeSetToSymbolicString(maConfig.mpOpenCLSubsetOpCodes));
     mpEditField->set_height_request(4 * mpEditField->GetTextHeight());
 
     mpEditField->SetModifyHdl(LINK(this, ScCalcOptionsDialog, EditModifiedHdl));
@@ -258,7 +258,7 @@ IMPL_LINK_NOARG(ScCalcOptionsDialog, DeviceSelHdl)
 
 IMPL_LINK(ScCalcOptionsDialog, EditModifiedHdl, Edit*, pCtrl)
 {
-    maConfig.maOpenCLSubsetOpCodes = ScStringToOpCodeSet(pCtrl->GetText());
+    maConfig.mpOpenCLSubsetOpCodes = ScStringToOpCodeSet(pCtrl->GetText());
     return 0;
 }
 
@@ -292,7 +292,7 @@ struct OpenCLTester
     ScDocShell* mpDocShell;
     ScDocument *mpDoc;
     bool mbOldAutoCalc;
-    ScCalcConfig maOldCalcConfig;
+    ScCalcConfig mpOldCalcConfig;
 
     OpenCLTester() :
         mnTestAreas(0)
@@ -311,10 +311,10 @@ struct OpenCLTester
 
         mbOldAutoCalc = mpDoc->GetAutoCalc();
         mpDoc->SetAutoCalc(false);
-        maOldCalcConfig = ScInterpreter::GetGlobalConfig();
-        ScCalcConfig aConfig(maOldCalcConfig);
-        aConfig.mnOpenCLMinimumFormulaGroupSize = 20;
-        ScInterpreter::SetGlobalConfig(aConfig);
+        mpOldCalcConfig = ScInterpreter::GetGlobalConfig();
+        ScCalcConfig pConfig(mpOldCalcConfig);
+        pConfig.mnOpenCLMinimumFormulaGroupSize = 20;
+        ScInterpreter::SetGlobalConfig(pConfig);
 
         mpDoc->SetString(ScAddress(0,0,0), "Result:");
     }
@@ -822,7 +822,7 @@ IMPL_STATIC_LINK(
                                      }));
 
     xTestDocument->mpDoc->CalcAll();
-    ScInterpreter::SetGlobalConfig(xTestDocument->maOldCalcConfig);
+    ScInterpreter::SetGlobalConfig(xTestDocument->mpOldCalcConfig);
 
     return 0;
 }

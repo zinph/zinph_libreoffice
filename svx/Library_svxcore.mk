@@ -90,9 +90,11 @@ $(eval $(call gb_Library_use_externals,svxcore,\
 
 ifeq ($(OS),MACOSX)
 
+ifeq ($(ENABLE_MACOSX_SANDBOX),TRUE)
 $(eval $(call gb_Library_add_cxxflags,svxcore,\
     $(gb_OBJCXXFLAGS) \
 ))
+endif
 
 $(eval $(call gb_Library_use_system_darwin_frameworks,svxcore,\
 	Foundation \

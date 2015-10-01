@@ -61,19 +61,11 @@ gb_CXXFLAGS := \
 # (see toolkit module for a case where it is necessary to do it this way)
 gb_OBJCXXFLAGS := \
 	-x objective-c++ \
-	-fobjc-exceptions \
-	$(if $(filter TRUE,$(COM_GCC_IS_CLANG)),,\
-		-fgnu-runtime \
-		-fconstant-string-class=NSConstantString \
-	)
+	-fobjc-exceptions
 
 gb_OBJCFLAGS := \
 	-x objective-c \
-	-fobjc-exceptions \
-	$(if $(filter TRUE,$(COM_GCC_IS_CLANG)),,\
-		-fgnu-runtime \
-		-fconstant-string-class=NSConstantString \
-	)
+	-fobjc-exceptions
 
 # LinkTarget class
 

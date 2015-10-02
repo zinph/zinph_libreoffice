@@ -310,13 +310,15 @@ void FilterHelper::SetFilters()
 }
 
 void FilterHelper::appendFilter(const ::rtl::OUString& aTitle, const ::rtl::OUString& aFilterString)
-throw( css::lang::IllegalArgumentException, css::uno::RuntimeException ) {
+//throw( css::lang::IllegalArgumentException, css::uno::RuntimeException )
+{
     DBG_PRINT_ENTRY(CLASS_NAME, __func__, "title", aTitle, "filter", aFilterString);
 
     SolarMutexGuard aGuard;
 
     if( FilterNameExists( aTitle ) ) {
-        throw css::lang::IllegalArgumentException();
+        /* throw css::lang::IllegalArgumentException(); */
+        return;
     }
 
     // ensure that we have a filter list
@@ -331,7 +333,8 @@ throw( css::lang::IllegalArgumentException, css::uno::RuntimeException ) {
 }
 
 void FilterHelper::setCurrentFilter( const ::rtl::OUString& aTitle )
-throw( css::lang::IllegalArgumentException, css::uno::RuntimeException ) {
+//throw( css::lang::IllegalArgumentException, css::uno::RuntimeException )
+{
     DBG_PRINT_ENTRY(CLASS_NAME, __func__, "aTitle", OUStringToOString(aTitle, RTL_TEXTENCODING_UTF8).getStr());
 
     SetCurFilter(aTitle);
@@ -340,7 +343,8 @@ throw( css::lang::IllegalArgumentException, css::uno::RuntimeException ) {
 }
 
 ::rtl::OUString SAL_CALL FilterHelper::getCurrentFilter(  )
-throw( css::uno::RuntimeException ) {
+//throw( css::uno::RuntimeException )
+{
     DBG_PRINT_ENTRY(CLASS_NAME, __func__);
 
     ::rtl::OUString sReturn = (m_aCurrentFilter);
@@ -351,8 +355,8 @@ throw( css::uno::RuntimeException ) {
 }
 
 void SAL_CALL FilterHelper::appendFilterGroup( const ::rtl::OUString& sGroupTitle, const css::uno::Sequence< css::beans::StringPair >& aFilters )
-throw (css::lang::IllegalArgumentException, css::uno::RuntimeException) {
-
+//throw (css::lang::IllegalArgumentException, css::uno::RuntimeException)
+{
     DBG_PRINT_ENTRY(CLASS_NAME, __func__, "title", OUStringToOString(sGroupTitle, RTL_TEXTENCODING_UTF8).getStr());
 
     SolarMutexGuard aGuard;

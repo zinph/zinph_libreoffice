@@ -92,15 +92,15 @@ class SAL_NO_VTABLE SAL_DLLPUBLIC_TEMPLATE ImplHelper
 
 public:
     css::uno::Any SAL_CALL queryInterface( css::uno::Type const & rType )
-        throw ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
     { return ImplHelper_query( rType, cd::get(), this ); }
 
     css::uno::Sequence< css::uno::Type > SAL_CALL getTypes()
-        throw ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
     { return ImplHelper_getTypes( cd::get() ); }
 
     css::uno::Sequence< sal_Int8 > SAL_CALL getImplementationId()
-        throw ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
     { return ImplHelper_getImplementationId( cd::get() ); }
 
 protected:
@@ -133,19 +133,23 @@ protected:
 
 public:
     css::uno::Any SAL_CALL queryInterface(css::uno::Type const & aType)
-        throw (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
     { return WeakImplHelper_query(aType, cd::get(), this, this); }
 
-    void SAL_CALL acquire() throw () SAL_OVERRIDE { OWeakObject::acquire(); }
+    void SAL_CALL acquire()
+        SAL_THROW_IfNotObjectiveC () SAL_OVERRIDE
+    { OWeakObject::acquire(); }
 
-    void SAL_CALL release() throw () SAL_OVERRIDE { OWeakObject::release(); }
+    void SAL_CALL release()
+        SAL_THROW_IfNotObjectiveC () SAL_OVERRIDE
+    { OWeakObject::release(); }
 
     css::uno::Sequence<css::uno::Type> SAL_CALL getTypes()
-        throw (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
     { return WeakImplHelper_getTypes(cd::get()); }
 
     css::uno::Sequence<sal_Int8> SAL_CALL getImplementationId()
-        throw (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
     { return css::uno::Sequence<sal_Int8>(); }
 };
 
@@ -180,27 +184,27 @@ protected:
 
 public:
     css::uno::Any SAL_CALL queryInterface( css::uno::Type const & rType )
-        throw ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
     { return OWeakAggObject::queryInterface( rType ); }
 
     css::uno::Any SAL_CALL queryAggregation( css::uno::Type const & rType )
-        throw ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
     { return WeakAggImplHelper_queryAgg( rType, cd::get(), this, static_cast<OWeakAggObject *>(this) ); }
 
     void SAL_CALL acquire()
-        throw () SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( ) SAL_OVERRIDE
     { OWeakAggObject::acquire(); }
 
     void SAL_CALL release()
-        throw () SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( ) SAL_OVERRIDE
     { OWeakAggObject::release(); }
 
     css::uno::Sequence< css::uno::Type > SAL_CALL getTypes()
-        throw ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
     { return WeakAggImplHelper_getTypes( cd::get() ); }
 
     css::uno::Sequence< sal_Int8 > SAL_CALL getImplementationId()
-        throw ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
     { return ImplHelper_getImplementationId( cd::get() ); }
 };
 
@@ -239,22 +243,26 @@ protected:
 
 public:
     css::uno::Any SAL_CALL queryInterface(css::uno::Type const & aType)
-        throw (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
     {
         css::uno::Any ret(ImplHelper_queryNoXInterface(aType, cd::get(), this));
         return ret.hasValue() ? ret : BaseClass::queryInterface(aType);
     }
 
-    void SAL_CALL acquire() throw () SAL_OVERRIDE { BaseClass::acquire(); }
+    void SAL_CALL acquire()
+        SAL_THROW_IfNotObjectiveC () SAL_OVERRIDE
+    { BaseClass::acquire(); }
 
-    void SAL_CALL release() throw () SAL_OVERRIDE { BaseClass::release(); }
+    void SAL_CALL release()
+        SAL_THROW_IfNotObjectiveC () SAL_OVERRIDE
+    { BaseClass::release(); }
 
     css::uno::Sequence<css::uno::Type> SAL_CALL getTypes()
-        throw (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
     { return ImplInhHelper_getTypes(cd::get(), BaseClass::getTypes()); }
 
     css::uno::Sequence<sal_Int8> SAL_CALL getImplementationId()
-        throw (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
     { return css::uno::Sequence<sal_Int8>(); }
 };
 
@@ -293,30 +301,30 @@ protected:
 
 public:
     css::uno::Any SAL_CALL queryInterface( css::uno::Type const & rType )
-        throw ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
     { return BaseClass::queryInterface( rType ); }
 
     css::uno::Any SAL_CALL queryAggregation( css::uno::Type const & rType )
-        throw ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
     {
         css::uno::Any aRet( ImplHelper_queryNoXInterface( rType, cd::get(), this ) );
         return (aRet.hasValue()) ? aRet : BaseClass::queryAggregation( rType );
     }
 
     void SAL_CALL acquire()
-        throw ( ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( ) SAL_OVERRIDE
     { BaseClass::acquire(); }
 
     void SAL_CALL release()
-        throw ( ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( ) SAL_OVERRIDE
     { BaseClass::release(); }
 
     css::uno::Sequence< css::uno::Type > SAL_CALL getTypes()
-        throw ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
     { return ImplInhHelper_getTypes( cd::get(), BaseClass::getTypes() ); }
 
     css::uno::Sequence< sal_Int8 > SAL_CALL getImplementationId()
-        throw ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
     { return ImplHelper_getImplementationId( cd::get() ); }
 };
 

@@ -269,8 +269,18 @@ void AquaClipboard::fireClipboardChangedEvent()
     {
         if (listeners.front().is())
         {
-            try { listeners.front()->changedContents(aEvent); }
+#ifdef __OBJC__
+            @try {
+#else
+            try {
+#endif
+                listeners.front()->changedContents(aEvent);
+            }
+#ifdef __OBJC__
+            @catch (...) { }
+#else
             catch (RuntimeException&) { }
+#endif
         }
         listeners.pop_front();
     }
@@ -279,9 +289,18 @@ void AquaClipboard::fireClipboardChangedEvent()
 void AquaClipboard::fireLostClipboardOwnershipEvent(Reference<XClipboardOwner> oldOwner, Reference<XTransferable> oldContent)
 {
     BOOST_ASSERT(oldOwner.is());
-
-    try { oldOwner->lostOwnership(static_cast<XClipboardEx*>(this), oldContent); }
+#ifdef __OBJC__
+    @try {
+#else
+    try {
+#endif
+        oldOwner->lostOwnership(static_cast<XClipboardEx*>(this), oldContent);
+    }
+#ifdef __OBJC__
+    @catch(...) { }
+#else
     catch(RuntimeException&) { }
+#endif
 }
 
 void AquaClipboard::provideDataForType(NSPasteboard* sender, const NSString* type)

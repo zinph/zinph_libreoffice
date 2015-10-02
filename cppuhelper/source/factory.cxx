@@ -83,29 +83,29 @@ public:
 
     // XInterface
     Any SAL_CALL queryInterface( const Type & rType )
-        throw(css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception ) override;
 
     // XSingleServiceFactory
     Reference<XInterface > SAL_CALL createInstance()
-        throw(css::uno::Exception, css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException, std::exception ) override;
     virtual Reference<XInterface > SAL_CALL createInstanceWithArguments(const Sequence<Any>& Arguments)
-        throw(css::uno::Exception, css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException, std::exception ) override;
     // XSingleComponentFactory
     virtual Reference< XInterface > SAL_CALL createInstanceWithContext(
         Reference< XComponentContext > const & xContext )
-        throw (Exception, RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC ( Exception, RuntimeException, std::exception ) override;
     virtual Reference< XInterface > SAL_CALL createInstanceWithArgumentsAndContext(
         Sequence< Any > const & rArguments,
         Reference< XComponentContext > const & xContext )
-        throw (Exception, RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC ( Exception, RuntimeException, std::exception ) override;
 
     // XServiceInfo
     OUString SAL_CALL getImplementationName()
-        throw(css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception ) override;
     sal_Bool SAL_CALL supportsService(const OUString& ServiceName)
-        throw(css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception ) override;
     Sequence< OUString > SAL_CALL getSupportedServiceNames()
-        throw(css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception ) override;
 
 protected:
     /**
@@ -115,7 +115,7 @@ protected:
      */
     virtual Reference<XInterface >  createInstanceEveryTime(
         Reference< XComponentContext > const & xContext )
-        throw(css::uno::Exception, css::uno::RuntimeException);
+        SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException );
 
     Reference<XMultiServiceFactory > xSMgr;
     ComponentInstantiation           pCreateFunction;
@@ -130,7 +130,7 @@ OSingleFactoryHelper::~OSingleFactoryHelper()
 
 
 Any OSingleFactoryHelper::queryInterface( const Type & rType )
-    throw(css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception )
 {
     return ::cppu::queryInterface(
         rType,
@@ -143,7 +143,7 @@ Any OSingleFactoryHelper::queryInterface( const Type & rType )
 // OSingleFactoryHelper
 Reference<XInterface > OSingleFactoryHelper::createInstanceEveryTime(
     Reference< XComponentContext > const & xContext )
-    throw(css::uno::Exception, css::uno::RuntimeException)
+    SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException )
 {
     if (m_fptr)
     {
@@ -168,7 +168,7 @@ Reference<XInterface > OSingleFactoryHelper::createInstanceEveryTime(
 
 // XSingleServiceFactory
 Reference<XInterface > OSingleFactoryHelper::createInstance()
-    throw(css::uno::Exception, css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException, std::exception )
 {
     return createInstanceWithContext( Reference< XComponentContext >() );
 }
@@ -176,7 +176,7 @@ Reference<XInterface > OSingleFactoryHelper::createInstance()
 // XSingleServiceFactory
 Reference<XInterface > OSingleFactoryHelper::createInstanceWithArguments(
     const Sequence<Any>& Arguments )
-    throw(css::uno::Exception, css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException, std::exception )
 {
     return createInstanceWithArgumentsAndContext(
         Arguments, Reference< XComponentContext >() );
@@ -186,7 +186,7 @@ Reference<XInterface > OSingleFactoryHelper::createInstanceWithArguments(
 
 Reference< XInterface > OSingleFactoryHelper::createInstanceWithContext(
     Reference< XComponentContext > const & xContext )
-    throw (Exception, RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( Exception, RuntimeException, std::exception )
 {
     return createInstanceEveryTime( xContext );
 }
@@ -194,7 +194,7 @@ Reference< XInterface > OSingleFactoryHelper::createInstanceWithContext(
 Reference< XInterface > OSingleFactoryHelper::createInstanceWithArgumentsAndContext(
     Sequence< Any > const & rArguments,
     Reference< XComponentContext > const & xContext )
-    throw (Exception, RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( Exception, RuntimeException, std::exception )
 {
     Reference< XInterface > xRet( createInstanceWithContext( xContext ) );
 
@@ -215,9 +215,13 @@ Reference< XInterface > OSingleFactoryHelper::createInstanceWithArgumentsAndCont
             if (xComp.is())
                 xComp->dispose();
 
+            #ifndef __OBJC__
             throw lang::IllegalArgumentException(
                 OUString("cannot pass arguments to component => no XInitialization implemented!"),
                 Reference< XInterface >(), 0 );
+            #else
+            OSL_FAIL( "cannot pass arguments to component => no XInitialization implemented" );
+            #endif
         }
     }
 
@@ -226,7 +230,7 @@ Reference< XInterface > OSingleFactoryHelper::createInstanceWithArgumentsAndCont
 
 // XServiceInfo
 OUString OSingleFactoryHelper::getImplementationName()
-    throw(css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception )
 {
     return aImplementationName;
 }
@@ -234,14 +238,14 @@ OUString OSingleFactoryHelper::getImplementationName()
 // XServiceInfo
 sal_Bool OSingleFactoryHelper::supportsService(
     const OUString& ServiceName )
-    throw(css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception )
 {
     return cppu::supportsService(this, ServiceName);
 }
 
 // XServiceInfo
 Sequence< OUString > OSingleFactoryHelper::getSupportedServiceNames()
-    throw(css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception )
 {
     return aServiceNames;
 }
@@ -272,40 +276,40 @@ public:
 
     // XInterface
     Any SAL_CALL queryInterface( const Type & rType )
-        throw(css::uno::RuntimeException, std::exception) override;
-    void SAL_CALL acquire() throw() override
+        SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception ) override;
+    void SAL_CALL acquire() SAL_THROW_IfNotObjectiveC( ) override
         { OComponentHelper::acquire(); }
-    void SAL_CALL release() throw() override
+    void SAL_CALL release() SAL_THROW_IfNotObjectiveC( ) override
         { OComponentHelper::release(); }
 
     // XSingleServiceFactory
     Reference<XInterface > SAL_CALL createInstance()
-        throw(css::uno::Exception, css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException, std::exception ) override;
     Reference<XInterface > SAL_CALL createInstanceWithArguments( const Sequence<Any>& Arguments )
-        throw(css::uno::Exception, css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException, std::exception ) override;
     // XSingleComponentFactory
     virtual Reference< XInterface > SAL_CALL createInstanceWithContext(
         Reference< XComponentContext > const & xContext )
-        throw (Exception, RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( Exception, RuntimeException, std::exception ) override;
     virtual Reference< XInterface > SAL_CALL createInstanceWithArgumentsAndContext(
         Sequence< Any > const & rArguments,
         Reference< XComponentContext > const & xContext )
-        throw (Exception, RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( Exception, RuntimeException, std::exception ) override;
 
     // XTypeProvider
-    virtual Sequence< Type > SAL_CALL getTypes() throw (css::uno::RuntimeException, std::exception) override;
-    virtual Sequence< sal_Int8 > SAL_CALL getImplementationId() throw(css::uno::RuntimeException, std::exception) override;
+    virtual Sequence< Type > SAL_CALL getTypes() SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception ) override;
+    virtual Sequence< sal_Int8 > SAL_CALL getImplementationId() SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception ) override;
 
     // XAggregation
     Any SAL_CALL queryAggregation( const Type & rType )
-        throw(css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception ) override;
 
     // XUnloadingPreference
     virtual sal_Bool SAL_CALL releaseOnNotification()
-        throw(css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception ) override;
 
     // OComponentHelper
-    void SAL_CALL dispose() throw(css::uno::RuntimeException, std::exception) override;
+    void SAL_CALL dispose() SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception ) override;
 
 private:
     Reference<XInterface >  xTheInstance;
@@ -318,7 +322,7 @@ protected:
 
 
 Any SAL_CALL OFactoryComponentHelper::queryInterface( const Type & rType )
-    throw(css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception )
 {
     if( rType == cppu::UnoType<XUnloadingPreference>::get() )
     {
@@ -331,7 +335,7 @@ Any SAL_CALL OFactoryComponentHelper::queryInterface( const Type & rType )
 
 // XAggregation
 Any OFactoryComponentHelper::queryAggregation( const Type & rType )
-    throw(css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception )
 {
     Any aRet( OComponentHelper::queryAggregation( rType ) );
     return (aRet.hasValue() ? aRet : OSingleFactoryHelper::queryInterface( rType ));
@@ -339,7 +343,7 @@ Any OFactoryComponentHelper::queryAggregation( const Type & rType )
 
 // XTypeProvider
 Sequence< Type > OFactoryComponentHelper::getTypes()
-    throw (css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception )
 {
     Type ar[ 4 ];
     ar[ 0 ] = cppu::UnoType<XSingleServiceFactory>::get();
@@ -353,14 +357,14 @@ Sequence< Type > OFactoryComponentHelper::getTypes()
 }
 
 Sequence< sal_Int8 > OFactoryComponentHelper::getImplementationId()
-    throw (css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception )
 {
     return css::uno::Sequence<sal_Int8>();
 }
 
 // XSingleServiceFactory
 Reference<XInterface > OFactoryComponentHelper::createInstance()
-    throw(css::uno::Exception, css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException, std::exception )
 {
     if( bOneInstance )
     {
@@ -377,7 +381,7 @@ Reference<XInterface > OFactoryComponentHelper::createInstance()
 
 Reference<XInterface > OFactoryComponentHelper::createInstanceWithArguments(
     const Sequence<Any>& Arguments )
-    throw(css::uno::Exception, css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException, std::exception )
 {
     if( bOneInstance )
     {
@@ -397,7 +401,7 @@ Reference<XInterface > OFactoryComponentHelper::createInstanceWithArguments(
 
 Reference< XInterface > OFactoryComponentHelper::createInstanceWithContext(
     Reference< XComponentContext > const & xContext )
-    throw (Exception, RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( Exception, RuntimeException, std::exception )
 {
     if( bOneInstance )
     {
@@ -416,7 +420,7 @@ Reference< XInterface > OFactoryComponentHelper::createInstanceWithContext(
 Reference< XInterface > OFactoryComponentHelper::createInstanceWithArgumentsAndContext(
     Sequence< Any > const & rArguments,
     Reference< XComponentContext > const & xContext )
-    throw (Exception, RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( Exception, RuntimeException, std::exception )
 {
     if( bOneInstance )
     {
@@ -435,7 +439,7 @@ Reference< XInterface > OFactoryComponentHelper::createInstanceWithArgumentsAndC
 
 // OComponentHelper
 void OFactoryComponentHelper::dispose()
-    throw(css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception )
 {
     OComponentHelper::dispose();
 
@@ -459,7 +463,8 @@ void OFactoryComponentHelper::dispose()
 // one-instance factory: sal_False
 // single factory: sal_True
 // component factory: sal_True
-sal_Bool SAL_CALL OFactoryComponentHelper::releaseOnNotification() throw(css::uno::RuntimeException, std::exception)
+sal_Bool SAL_CALL OFactoryComponentHelper::releaseOnNotification()
+    SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception )
 {
     if( bOneInstance)
         return sal_False;
@@ -484,25 +489,25 @@ public:
 
     // XInterface
     virtual Any SAL_CALL queryInterface( Type const & type )
-        throw (RuntimeException, std::exception) override;
-    virtual void SAL_CALL acquire() throw () override;
-    virtual void SAL_CALL release() throw () override;
+        SAL_THROW_IfNotObjectiveC( RuntimeException, std::exception ) override;
+    virtual void SAL_CALL acquire() SAL_THROW_IfNotObjectiveC( ) override;
+    virtual void SAL_CALL release() SAL_THROW_IfNotObjectiveC( ) override;
     // XTypeProvider
     virtual Sequence< Type > SAL_CALL getTypes()
-        throw (RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( RuntimeException, std::exception ) override;
     // XPropertySet
     virtual Reference< beans::XPropertySetInfo > SAL_CALL getPropertySetInfo()
-        throw (RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( RuntimeException, std::exception ) override;
 
     // OPropertySetHelper
     virtual IPropertyArrayHelper & SAL_CALL getInfoHelper() override;
     virtual sal_Bool SAL_CALL convertFastPropertyValue(
         Any & rConvertedValue, Any & rOldValue,
         sal_Int32 nHandle, Any const & rValue )
-        throw (lang::IllegalArgumentException) override;
+        SAL_THROW_IfNotObjectiveC( lang::IllegalArgumentException ) override;
     virtual void SAL_CALL setFastPropertyValue_NoBroadcast(
         sal_Int32 nHandle, Any const & rValue )
-        throw (Exception, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( Exception, std::exception ) override;
     using OPropertySetHelper::getFastPropertyValue;
     virtual void SAL_CALL getFastPropertyValue(
         Any & rValue, sal_Int32 nHandle ) const override;
@@ -510,28 +515,28 @@ public:
     // OSingleFactoryHelper
     Reference<XInterface > createInstanceEveryTime(
         Reference< XComponentContext > const & xContext )
-        throw(css::uno::Exception, css::uno::RuntimeException) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException ) override;
 
     // XSingleServiceFactory
     Reference<XInterface > SAL_CALL createInstanceWithArguments(const Sequence<Any>& Arguments)
-        throw(css::uno::Exception, css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException, std::exception ) override;
     // XSingleComponentFactory
     Reference< XInterface > SAL_CALL createInstanceWithArgumentsAndContext(
         Sequence< Any > const & rArguments,
         Reference< XComponentContext > const & xContext )
-        throw (Exception, RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( Exception, RuntimeException, std::exception ) override;
 
     // XServiceInfo
     Sequence< OUString > SAL_CALL getSupportedServiceNames()
-        throw(css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception ) override;
     // XUnloadingPreference
     sal_Bool SAL_CALL releaseOnNotification()
-        throw( RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( RuntimeException, std::exception ) override;
 
 
 private:
     Reference< XInterface > createModuleFactory()
-        throw(css::uno::Exception, css::uno::RuntimeException);
+        SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException );
 
     /** The registry key of the implementation section */
     Reference<XRegistryKey >    xImplementationKey;
@@ -547,7 +552,8 @@ protected:
 // XInterface
 
 Any SAL_CALL ORegistryFactoryHelper::queryInterface(
-    Type const & type ) throw (RuntimeException, std::exception)
+    Type const & type )
+    SAL_THROW_IfNotObjectiveC( RuntimeException, std::exception )
 {
     Any ret( OFactoryComponentHelper::queryInterface( type ) );
     if (ret.hasValue())
@@ -557,20 +563,23 @@ Any SAL_CALL ORegistryFactoryHelper::queryInterface(
 }
 
 
-void ORegistryFactoryHelper::acquire() throw ()
+void ORegistryFactoryHelper::acquire()
+    SAL_THROW_IfNotObjectiveC( )
 {
     OFactoryComponentHelper::acquire();
 }
 
 
-void ORegistryFactoryHelper::release() throw ()
+void ORegistryFactoryHelper::release()
+    SAL_THROW_IfNotObjectiveC( )
 {
     OFactoryComponentHelper::release();
 }
 
 // XTypeProvider
 
-Sequence< Type > ORegistryFactoryHelper::getTypes() throw (RuntimeException, std::exception)
+Sequence< Type > ORegistryFactoryHelper::getTypes()
+    SAL_THROW_IfNotObjectiveC( RuntimeException, std::exception )
 {
     Sequence< Type > types( OFactoryComponentHelper::getTypes() );
     sal_Int32 pos = types.getLength();
@@ -585,7 +594,8 @@ Sequence< Type > ORegistryFactoryHelper::getTypes() throw (RuntimeException, std
 // XPropertySet
 
 Reference< beans::XPropertySetInfo >
-ORegistryFactoryHelper::getPropertySetInfo() throw (RuntimeException, std::exception)
+ORegistryFactoryHelper::getPropertySetInfo()
+    SAL_THROW_IfNotObjectiveC( RuntimeException, std::exception )
 {
     ::osl::MutexGuard guard( aMutex );
     if (! m_xInfo.is())
@@ -615,7 +625,7 @@ IPropertyArrayHelper & ORegistryFactoryHelper::getInfoHelper()
 
 sal_Bool ORegistryFactoryHelper::convertFastPropertyValue(
     Any &, Any &, sal_Int32, Any const & )
-    throw (lang::IllegalArgumentException)
+    SAL_THROW_IfNotObjectiveC( lang::IllegalArgumentException )
 {
     OSL_FAIL( "unexpected!" );
     return false;
@@ -624,11 +634,15 @@ sal_Bool ORegistryFactoryHelper::convertFastPropertyValue(
 
 void ORegistryFactoryHelper::setFastPropertyValue_NoBroadcast(
     sal_Int32, Any const & )
-    throw (Exception, std::exception)
+    SAL_THROW_IfNotObjectiveC( Exception, std::exception )
 {
+    #ifndef __OBJC__
     throw beans::PropertyVetoException(
         "unexpected: only readonly properties!",
         static_cast< OWeakObject * >(this) );
+    #else
+    OSL_FAIL( "unexpected: only readonly properties" );
+    #endif
 }
 
 
@@ -642,15 +656,19 @@ void ORegistryFactoryHelper::getFastPropertyValue(
     else
     {
         rValue.clear();
+        #ifndef __OBJC__
         throw beans::UnknownPropertyException(
             "unknown property!", static_cast< OWeakObject * >(
                 const_cast< ORegistryFactoryHelper * >(this) ) );
+        #else
+        OSL_FAIL( "unknown property" );
+        #endif
     }
 }
 
 Reference<XInterface > ORegistryFactoryHelper::createInstanceEveryTime(
     Reference< XComponentContext > const & xContext )
-    throw(css::uno::Exception, css::uno::RuntimeException)
+    SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException )
 {
     if( !xModuleFactory.is() && !xModuleFactoryDepr.is() )
     {
@@ -679,7 +697,7 @@ Reference<XInterface > ORegistryFactoryHelper::createInstanceEveryTime(
 
 Reference<XInterface > SAL_CALL ORegistryFactoryHelper::createInstanceWithArguments(
     const Sequence<Any>& Arguments )
-    throw(css::uno::Exception, css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException, std::exception )
 {
     if( !xModuleFactory.is() && !xModuleFactoryDepr.is() )
     {
@@ -712,7 +730,7 @@ Reference<XInterface > SAL_CALL ORegistryFactoryHelper::createInstanceWithArgume
 Reference< XInterface > ORegistryFactoryHelper::createInstanceWithArgumentsAndContext(
     Sequence< Any > const & rArguments,
     Reference< XComponentContext > const & xContext )
-    throw (Exception, RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( Exception, RuntimeException, std::exception )
 {
     if( !xModuleFactory.is() && !xModuleFactoryDepr.is() )
     {
@@ -748,7 +766,7 @@ Reference< XInterface > ORegistryFactoryHelper::createInstanceWithArgumentsAndCo
 
 // OSingleFactoryHelper
 Reference< XInterface > ORegistryFactoryHelper::createModuleFactory()
-    throw(css::uno::Exception, css::uno::RuntimeException)
+    SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException )
 {
     OUString aActivatorUrl;
     OUString aActivatorName;
@@ -811,13 +829,17 @@ Reference< XInterface > ORegistryFactoryHelper::createModuleFactory()
 
 // XServiceInfo
 Sequence< OUString > ORegistryFactoryHelper::getSupportedServiceNames()
-    throw(css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception )
 {
     MutexGuard aGuard( aMutex );
     if( aServiceNames.getLength() == 0 )
     {
         // not yet loaded
+        #ifdef __OBJC__
+        @try
+        #else
         try
+        #endif
         {
             Reference<XRegistryKey > xKey = xImplementationKey->openKey( "UNO/SERVICES" );
 
@@ -835,14 +857,19 @@ Sequence< OUString > ORegistryFactoryHelper::getSupportedServiceNames()
                 aServiceNames = seqKeys;
             }
         }
+        #ifdef __OBJC__
+        @catch (...)
+        #else
         catch (InvalidRegistryException &)
+        #endif
         {
         }
     }
     return aServiceNames;
 }
 
-sal_Bool SAL_CALL ORegistryFactoryHelper::releaseOnNotification() throw(css::uno::RuntimeException, std::exception)
+sal_Bool SAL_CALL ORegistryFactoryHelper::releaseOnNotification()
+    SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception )
 {
     bool retVal= true;
     if( isOneInstance() && isInstance())
@@ -881,26 +908,26 @@ public:
 
     // XSingleServiceFactory
     Reference<XInterface > SAL_CALL createInstance()
-        throw(css::uno::Exception, css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException, std::exception ) override;
     Reference<XInterface > SAL_CALL createInstanceWithArguments(const Sequence<Any>& Arguments)
-        throw(css::uno::Exception, css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException, std::exception ) override;
 
     // XServiceInfo
     OUString SAL_CALL getImplementationName()
-        throw(css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception ) override;
     sal_Bool SAL_CALL supportsService(const OUString& ServiceName)
-        throw(css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception ) override;
     Sequence< OUString > SAL_CALL getSupportedServiceNames()
-        throw(css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception ) override;
     //XUnloadingPreference
     sal_Bool SAL_CALL releaseOnNotification()
-        throw(css::uno::RuntimeException, std::exception) override;
+        SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception ) override;
 
 };
 
 // XSingleServiceFactory
 Reference<XInterface > OFactoryProxyHelper::createInstance()
-    throw(css::uno::Exception, css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException, std::exception )
 {
     return xFactory->createInstance();
 }
@@ -910,14 +937,14 @@ Reference<XInterface > OFactoryProxyHelper::createInstanceWithArguments
 (
     const Sequence<Any>& Arguments
 )
-    throw(css::uno::Exception, css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::Exception, css::uno::RuntimeException, std::exception )
 {
     return xFactory->createInstanceWithArguments( Arguments );
 }
 
 // XServiceInfo
 OUString OFactoryProxyHelper::getImplementationName()
-    throw(css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception )
 {
     Reference<XServiceInfo > xInfo( xFactory, UNO_QUERY  );
     if( xInfo.is() )
@@ -927,14 +954,14 @@ OUString OFactoryProxyHelper::getImplementationName()
 
 // XServiceInfo
 sal_Bool OFactoryProxyHelper::supportsService(const OUString& ServiceName)
-    throw(css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception )
 {
     return cppu::supportsService(this, ServiceName);
 }
 
 // XServiceInfo
 Sequence< OUString > OFactoryProxyHelper::getSupportedServiceNames()
-    throw(css::uno::RuntimeException, std::exception)
+    SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception )
 {
     Reference<XServiceInfo > xInfo( xFactory, UNO_QUERY  );
     if( xInfo.is() )
@@ -942,7 +969,8 @@ Sequence< OUString > OFactoryProxyHelper::getSupportedServiceNames()
     return Sequence< OUString >();
 }
 
-sal_Bool SAL_CALL OFactoryProxyHelper::releaseOnNotification() throw(css::uno::RuntimeException, std::exception)
+sal_Bool SAL_CALL OFactoryProxyHelper::releaseOnNotification()
+    SAL_THROW_IfNotObjectiveC( css::uno::RuntimeException, std::exception )
 {
 
     Reference<XUnloadingPreference> pref( xFactory, UNO_QUERY);

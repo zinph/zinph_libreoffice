@@ -72,29 +72,31 @@ class SAL_NO_VTABLE SAL_DLLPUBLIC_TEMPLATE PartialWeakComponentImplHelper:
     {};
 
 public:
-    PartialWeakComponentImplHelper(osl::Mutex & mutex) throw ():
+    PartialWeakComponentImplHelper(osl::Mutex & mutex) SAL_THROW_IfNotObjectiveC ():
         WeakComponentImplHelperBase(mutex) {}
 
     css::uno::Any SAL_CALL queryInterface(css::uno::Type const & aType)
-        throw (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
     { return WeakComponentImplHelper_query(aType, cd::get(), this, this); }
 
-    void SAL_CALL acquire() throw () SAL_OVERRIDE
+    void SAL_CALL acquire()
+        SAL_THROW_IfNotObjectiveC () SAL_OVERRIDE
     { WeakComponentImplHelperBase::acquire(); }
 
-    void SAL_CALL release() throw () SAL_OVERRIDE
+    void SAL_CALL release()
+        SAL_THROW_IfNotObjectiveC () SAL_OVERRIDE
     { WeakComponentImplHelperBase::release(); }
 
-    void SAL_CALL dispose() throw (css::uno::RuntimeException, std::exception)
-        SAL_OVERRIDE
+    void SAL_CALL dispose()
+        SAL_THROW_IfNotObjectiveC (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
     { WeakComponentImplHelperBase::dispose(); }
 
     css::uno::Sequence<css::uno::Type> SAL_CALL getTypes()
-        throw (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
     { return WeakComponentImplHelper_getTypes(cd::get()); }
 
     css::uno::Sequence<sal_Int8> SAL_CALL getImplementationId()
-        throw (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
     { return css::uno::Sequence<sal_Int8>(); }
 };
 
@@ -114,17 +116,18 @@ class SAL_NO_VTABLE SAL_DLLPUBLIC_TEMPLATE WeakComponentImplHelper:
     public PartialWeakComponentImplHelper<Ifc...>
 {
 public:
-    WeakComponentImplHelper(osl::Mutex & mutex) throw ():
-        PartialWeakComponentImplHelper<Ifc...>(mutex) {}
+    WeakComponentImplHelper(osl::Mutex & mutex)
+        SAL_THROW_IfNotObjectiveC ()
+        : PartialWeakComponentImplHelper<Ifc...>(mutex) {}
 
     void SAL_CALL addEventListener(
         css::uno::Reference<css::lang::XEventListener> const & xListener)
-        throw (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
     { WeakComponentImplHelperBase::addEventListener(xListener); }
 
     void SAL_CALL removeEventListener(
         css::uno::Reference<css::lang::XEventListener> const & aListener)
-        throw (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC (css::uno::RuntimeException, std::exception) SAL_OVERRIDE
     { WeakComponentImplHelperBase::removeEventListener(aListener); }
 };
 
@@ -158,32 +161,32 @@ class SAL_NO_VTABLE SAL_DLLPUBLIC_TEMPLATE WeakAggComponentImplHelper
 
 public:
     inline WeakAggComponentImplHelper( ::osl::Mutex & rMutex )
-        throw ()
+        SAL_THROW_IfNotObjectiveC ()
     : WeakAggComponentImplHelperBase( rMutex )
     {}
 
     css::uno::Any SAL_CALL queryInterface( css::uno::Type const & rType )
-        throw ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
     { return WeakAggComponentImplHelperBase::queryInterface( rType ); }
 
     css::uno::Any SAL_CALL queryAggregation( css::uno::Type const & rType )
-        throw ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
     { return WeakAggComponentImplHelper_queryAgg( rType, cd::get(), this, static_cast<WeakAggComponentImplHelperBase *>(this) ); }
 
     void SAL_CALL acquire()
-        throw ( ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( ) SAL_OVERRIDE
     { WeakAggComponentImplHelperBase::acquire(); }
 
     void SAL_CALL release()
-        throw ( ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( ) SAL_OVERRIDE
     { WeakAggComponentImplHelperBase::release(); }
 
     css::uno::Sequence< css::uno::Type > SAL_CALL getTypes()
-        throw ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
     { return WeakAggComponentImplHelper_getTypes( cd::get() ); }
 
     css::uno::Sequence< sal_Int8 > SAL_CALL getImplementationId()
-        throw ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
+        SAL_THROW_IfNotObjectiveC ( css::uno::RuntimeException, std::exception ) SAL_OVERRIDE
     { return ImplHelper_getImplementationId( cd::get() ); }
 
 };

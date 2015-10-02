@@ -246,7 +246,7 @@ int SalAquaPicker::runandwaitforresult()
 }
 
 void SAL_CALL SalAquaPicker::implsetDisplayDirectory( const rtl::OUString& aDirectory )
-    throw( lang::IllegalArgumentException, uno::RuntimeException )
+    /*throw( lang::IllegalArgumentException, uno::RuntimeException )*/
 {
     DBG_PRINT_ENTRY(CLASS_NAME, __func__, "directory", aDirectory);
 
@@ -259,7 +259,8 @@ void SAL_CALL SalAquaPicker::implsetDisplayDirectory( const rtl::OUString& aDire
     DBG_PRINT_EXIT(CLASS_NAME, __func__);
 }
 
-rtl::OUString SAL_CALL SalAquaPicker::implgetDisplayDirectory() throw( uno::RuntimeException )
+rtl::OUString SAL_CALL SalAquaPicker::implgetDisplayDirectory()
+    /*throw( uno::RuntimeException )*/
 {
     DBG_PRINT_ENTRY(CLASS_NAME, __func__);
     DBG_PRINT_EXIT(CLASS_NAME, __func__, m_sDisplayDirectory);
@@ -267,7 +268,8 @@ rtl::OUString SAL_CALL SalAquaPicker::implgetDisplayDirectory() throw( uno::Runt
     return m_sDisplayDirectory;
 }
 
-void SAL_CALL SalAquaPicker::implsetTitle( const rtl::OUString& aTitle ) throw( uno::RuntimeException )
+void SAL_CALL SalAquaPicker::implsetTitle( const rtl::OUString& aTitle )
+    /*throw( uno::RuntimeException )*/
 {
     DBG_PRINT_ENTRY(CLASS_NAME, __func__, "title", aTitle);
 

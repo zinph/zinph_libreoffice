@@ -219,7 +219,7 @@ double ScColorScaleEntry::GetValue() const
 {
     if(mpCell)
     {
-        mpCell->Interpret(officecfg::Office::Common::Misc::UseOpenCL::get());
+        mpCell->Interpret();
         if(mpCell->IsValue())
             return mpCell->GetValue();
 

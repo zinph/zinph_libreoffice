@@ -92,17 +92,10 @@ void ScColumn::BroadcastCells( const std::vector<SCROW>& rRows, sal_uLong nHint 
 
 struct DirtyCellInterpreter
 {
-    bool mbUseOpenCL;
-
-    DirtyCellInterpreter() :
-        mbUseOpenCL(officecfg::Office::Common::Misc::UseOpenCL::get())
-    {
-    }
-
     void operator() (size_t, ScFormulaCell* p)
     {
         if (p->GetDirty())
-            p->Interpret(mbUseOpenCL);
+            p->Interpret();
     }
 };
 

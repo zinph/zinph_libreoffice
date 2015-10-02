@@ -1014,7 +1014,7 @@ bool ScDocFunc::SetFormulaCell( const ScAddress& rPos, ScFormulaCell* pCell, boo
     if (bInteraction && !rDoc.GetAutoCalc() && pCell)
     {
         // calculate just the cell once and set Dirty again
-        pCell->Interpret(officecfg::Office::Common::Misc::UseOpenCL::get());
+        pCell->Interpret();
         pCell->SetDirtyVar();
         rDoc.PutInFormulaTree( pCell);
     }

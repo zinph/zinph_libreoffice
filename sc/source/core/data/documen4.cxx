@@ -85,7 +85,6 @@ bool ScDocument::Solver(SCCOL nFCol, SCROW nFRow, SCTAB nFTab,
         ScFormulaCell* pFormula = NULL;
         double fTargetVal = 0.0;
         sal_uInt32 nFIndex = 0;
-        const bool bUseOpenCL(officecfg::Office::Common::Misc::UseOpenCL::get());
         if ( eFType == CELLTYPE_FORMULA && eVType == CELLTYPE_VALUE &&
              GetFormatTable()->IsNumberFormat( sValStr, nFIndex, fTargetVal ) )
         {
@@ -110,7 +109,7 @@ bool ScDocument::Solver(SCCOL nFCol, SCROW nFRow, SCTAB nFTab,
             double fBestF, fFPrev;
             fBestX = fXPrev = fSaveVal;
 
-            pFormula->Interpret( bUseOpenCL );
+            pFormula->Interpret();
             bool bError = ( pFormula->GetErrCode() != 0 );
             // bError always corresponds with fF
 
@@ -132,7 +131,7 @@ bool ScDocument::Solver(SCCOL nFCol, SCROW nFRow, SCTAB nFTab,
             {
                 *pVCell = fX;
                 SetDirty( aVRange, false );
-                pFormula->Interpret( bUseOpenCL );
+                pFormula->Interpret();
                 bError = ( pFormula->GetErrCode() != 0 );
                 fF = pFormula->GetValue() - fTargetVal;
 
@@ -166,7 +165,7 @@ bool ScDocument::Solver(SCCOL nFCol, SCROW nFRow, SCTAB nFTab,
 
                             *pVCell = fHorX;
                             SetDirty( aVRange, false );
-                            pFormula->Interpret( bUseOpenCL );
+                            pFormula->Interpret();
                             bHorMoveError = ( pFormula->GetErrCode() != 0 );
                             if ( bHorMoveError )
                                 break;
@@ -230,7 +229,7 @@ bool ScDocument::Solver(SCCOL nFCol, SCROW nFRow, SCTAB nFTab,
             {
                 *pVCell = nX;
                 SetDirty( aVRange, false );
-                pFormula->Interpret( bUseOpenCL );
+                pFormula->Interpret();
                 if ( fabs( pFormula->GetValue() - fTargetVal ) > fabs( fF ) )
                     nX = fBestX;
                 bRet = true;
@@ -241,7 +240,7 @@ bool ScDocument::Solver(SCCOL nFCol, SCROW nFRow, SCTAB nFTab,
             }
             *pVCell = fSaveVal;
             SetDirty( aVRange, false );
-            pFormula->Interpret( bUseOpenCL );
+            pFormula->Interpret();
             if ( !bDoneIteration )
             {
                 SetError( nVCol, nVRow, nVTab, NOTAVAILABLE );

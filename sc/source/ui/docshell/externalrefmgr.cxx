@@ -2669,7 +2669,7 @@ void ScExternalRefManager::clearCache(sal_uInt16 nFileId)
 
 namespace {
 
-class RefCacheFiller : public sc::ColumnSpanSet::ColumnAction
+class RefCacheFiller
 {
     svl::SharedStringPool& mrStrPool;
 
@@ -2683,7 +2683,7 @@ public:
     RefCacheFiller( svl::SharedStringPool& rStrPool, ScExternalRefCache& rRefCache, sal_uInt16 nFileId ) :
         mrStrPool(rStrPool), mrRefCache(rRefCache), mnFileId(nFileId), mpCurCol(NULL) {}
 
-    virtual void startColumn( ScColumn* pCol ) SAL_OVERRIDE
+    void startColumn( ScColumn* pCol )
     {
         mpCurCol = pCol;
         if (!mpCurCol)
@@ -2693,7 +2693,7 @@ public:
         mpRefTab = mrRefCache.getCacheTable(mnFileId, mpCurCol->GetTab());
     }
 
-    virtual void execute( SCROW nRow1, SCROW nRow2, bool bVal ) SAL_OVERRIDE
+    void execute( SCROW nRow1, SCROW nRow2, bool bVal )
     {
         if (!mpCurCol || !bVal)
             return;

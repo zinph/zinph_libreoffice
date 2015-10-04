@@ -48,7 +48,7 @@
 #include <xmloff/shapeimport.hxx>
 #include <xmloff/SchXMLImportHelper.hxx>
 #include <xmloff/ProgressBarHelper.hxx>
-#include <cppuhelper/implbase7.hxx>
+#include <cppuhelper/implbase.hxx>
 #include <xmloff/formlayerimport.hxx>
 
 #include <com/sun/star/beans/NamedValue.hpp>
@@ -104,7 +104,7 @@ namespace o3tl
 }
 
 
-class XMLOFF_DLLPUBLIC SvXMLImport : public ::cppu::WeakImplHelper7<
+class XMLOFF_DLLPUBLIC SvXMLImport : public ::cppu::WeakImplHelper<
              css::xml::sax::XExtendedDocumentHandler,
              css::xml::sax::XFastDocumentHandler,
              css::lang::XServiceInfo,

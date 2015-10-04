@@ -21,7 +21,7 @@
 #define INCLUDED_SVX_SOURCE_TABLE_TABLEROWS_HXX
 
 #include <com/sun/star/table/XTableRows.hpp>
-#include <cppuhelper/implbase1.hxx>
+#include <cppuhelper/implbase.hxx>
 
 #include "tablemodel.hxx"
 
@@ -29,7 +29,7 @@
 
 namespace sdr { namespace table {
 
-class TableRows : public ::cppu::WeakAggImplHelper1< css::table::XTableRows >
+class TableRows : public ::cppu::WeakAggImplHelper< css::table::XTableRows >
 {
 public:
     explicit TableRows( const TableModelRef& xTableModel );

@@ -41,8 +41,7 @@
 
 #include <comphelper/propmultiplex.hxx>
 #include <cppuhelper/component.hxx>
-#include <cppuhelper/implbase1.hxx>
-#include <cppuhelper/implbase2.hxx>
+#include <cppuhelper/implbase.hxx>
 #include <tools/diagnose_ex.h>
 
 class DbCellControl;
@@ -702,11 +701,10 @@ protected:
 
 // Base class providing the access to a grid cell
 
-typedef ::cppu::ImplHelper2 <   css::awt::XControl
-                            ,   css::form::XBoundControl
-                            >   FmXGridCell_Base;
-typedef ::cppu::ImplHelper1 <   css::awt::XWindow
-                            >   FmXGridCell_WindowBase;
+typedef ::cppu::ImplHelper< css::awt::XControl
+                          , css::form::XBoundControl
+                          > FmXGridCell_Base;
+typedef ::cppu::ImplHelper< css::awt::XWindow > FmXGridCell_WindowBase;
 class FmXGridCell   :public ::cppu::OComponentHelper
                     ,public FmXGridCell_Base
                     ,public FmXGridCell_WindowBase
@@ -860,9 +858,9 @@ public:
 };
 
 
-typedef ::cppu::ImplHelper2 <   css::awt::XTextComponent
-                            ,   css::form::XChangeBroadcaster
-                            >   FmXEditCell_Base;
+typedef ::cppu::ImplHelper < css::awt::XTextComponent
+                           , css::form::XChangeBroadcaster
+                           > FmXEditCell_Base;
 class FmXEditCell : public FmXTextCell,
                     public FmXEditCell_Base
 {
@@ -918,9 +916,9 @@ private:
 };
 
 
-typedef ::cppu::ImplHelper2 <   css::awt::XCheckBox
-                            ,   css::awt::XButton
-                            >   FmXCheckBoxCell_Base;
+typedef ::cppu::ImplHelper < css::awt::XCheckBox
+                           , css::awt::XButton
+                           > FmXCheckBoxCell_Base;
 class FmXCheckBoxCell : public FmXDataCell,
                         public FmXCheckBoxCell_Base
 {
@@ -964,8 +962,7 @@ protected:
 };
 
 
-typedef ::cppu::ImplHelper1 <   css::awt::XListBox
-                            >   FmXListBoxCell_Base;
+typedef ::cppu::ImplHelper< css::awt::XListBox > FmXListBoxCell_Base;
 class FmXListBoxCell    :public FmXTextCell
                         ,public FmXListBoxCell_Base
 {
@@ -1018,8 +1015,7 @@ protected:
 };
 
 
-typedef ::cppu::ImplHelper1 <   css::awt::XComboBox
-                            >   FmXComboBoxCell_Base;
+typedef ::cppu::ImplHelper< css::awt::XComboBox > FmXComboBoxCell_Base;
 class FmXComboBoxCell   :public FmXTextCell
                         ,public FmXComboBoxCell_Base
 {
@@ -1061,9 +1057,9 @@ protected:
 };
 
 
-typedef ::cppu::ImplHelper2 <   css::awt::XTextComponent
-                            ,   css::lang::XUnoTunnel
-                            >   FmXFilterCell_Base;
+typedef ::cppu::ImplHelper < css::awt::XTextComponent
+                           , css::lang::XUnoTunnel
+                           > FmXFilterCell_Base;
 class FmXFilterCell :public FmXGridCell
                     ,public FmXFilterCell_Base
 {

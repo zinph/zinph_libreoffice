@@ -77,7 +77,7 @@ sal_Int16 SAL_CALL SvXMLAttributeList::getLength() throw( css::uno::RuntimeExcep
 
 
 SvXMLAttributeList::SvXMLAttributeList( const SvXMLAttributeList &r ) :
-    cppu::WeakImplHelper3<css::xml::sax::XAttributeList, css::util::XCloneable, css::lang::XUnoTunnel>(r),
+    cppu::WeakImplHelper< css::xml::sax::XAttributeList, css::util::XCloneable, css::lang::XUnoTunnel >(r),
     m_pImpl( new SvXMLAttributeList_Impl( *r.m_pImpl ) )
 {
 }

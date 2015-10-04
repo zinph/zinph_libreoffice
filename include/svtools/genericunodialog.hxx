@@ -31,7 +31,7 @@
 #include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/lang/NotInitializedException.hpp>
 
-#include <cppuhelper/implbase3.hxx>
+#include <cppuhelper/implbase.hxx>
 #include <cppuhelper/propshlp.hxx>
 #include <comphelper/proparrhlp.hxx>
 #include <comphelper/uno3.hxx>
@@ -58,7 +58,7 @@ namespace svt
 
 
 
-    typedef ::cppu::WeakImplHelper3 <   css::ui::dialogs::XExecutableDialog
+    typedef ::cppu::WeakImplHelper  <   css::ui::dialogs::XExecutableDialog
                                     ,   css::lang::XServiceInfo
                                     ,   css::lang::XInitialization
                                     >   OGenericUnoDialogBase;

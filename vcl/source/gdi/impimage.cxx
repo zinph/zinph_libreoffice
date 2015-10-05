@@ -349,9 +349,7 @@ pOutDev
 
 void ImplImageBmp::ImplUpdateDisabledBmpEx( int nPos )
 {
-    maDisabledBmpEx = maBmpEx;
-
-    /*const Size aTotalSize( maBmpEx.GetSizePixel() );
+    const Size aTotalSize( maBmpEx.GetSizePixel() );
 
     if( maDisabledBmpEx.IsEmpty() )
     {
@@ -399,7 +397,7 @@ void ImplImageBmp::ImplUpdateDisabledBmpEx( int nPos )
     Bitmap::ReleaseAccess( pGrey );
     aGreyAlphaMask.ReleaseAccess( pGreyAlphaMask );
 
-    maDisabledBmpEx = BitmapEx( aGrey, aGreyAlphaMask );*/
+    maDisabledBmpEx = BitmapEx( aGrey, aGreyAlphaMask );
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

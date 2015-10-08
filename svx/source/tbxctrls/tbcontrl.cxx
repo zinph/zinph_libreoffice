@@ -138,7 +138,7 @@ public:
 
 protected:
     /// Calculate the optimal width of the dropdown.  Very expensive operation, triggers lots of font measurement.
-    DECL_DLLPRIVATE_LINK_TYPED(CalcOptimalExtraUserWidth, VclWindowEvent&, void);
+    DECL_DLLPRIVATE_LINK(CalcOptimalExtraUserWidth, VclWindowEvent*);
 
     virtual void    Select() SAL_OVERRIDE;
 
@@ -797,11 +797,11 @@ void SvxStyleBox_Impl::UserDraw( const UserDrawEvent& rUDEvt )
     DrawEntry( rUDEvt, false, false );
 }
 
-IMPL_LINK_TYPED(SvxStyleBox_Impl, CalcOptimalExtraUserWidth, VclWindowEvent&, event, void)
+IMPL_LINK(SvxStyleBox_Impl, CalcOptimalExtraUserWidth, VclWindowEvent*, event)
 {
     // perform the calculation only when we are opening the dropdown
-    if (event.GetId() != VCLEVENT_DROPDOWN_PRE_OPEN)
-        return;
+    if (event->GetId() != VCLEVENT_DROPDOWN_PRE_OPEN)
+        return 0;
 
     long nMaxNormalFontWidth = 0;
     sal_Int32 nEntryCount = GetEntryCount();
@@ -838,6 +838,8 @@ IMPL_LINK_TYPED(SvxStyleBox_Impl, CalcOptimalExtraUserWidth, VclWindowEvent&, ev
     }
 
     SetUserItemSize(Size(nMaxUserDrawFontWidth - nMaxNormalFontWidth, ITEM_HEIGHT));
+
+    return 0;
 }
 
 // test is the color between Font- and background-color to be identify

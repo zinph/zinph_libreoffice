@@ -280,8 +280,9 @@ public:
 
     void                        ExecPrint( const com::sun::star::uno::Sequence < com::sun::star::beans::PropertyValue >&, bool, bool );
     // Like ExecPrint(), but only sets up for printing. Use Printer::ExecutePrintJob() and Printer::FinishPrintJob() afterwards.
-    void                        StartPrint( const com::sun::star::uno::Sequence < com::sun::star::beans::PropertyValue >&, bool, bool );
+    void                        StartPrint( const com::sun::star::uno::Sequence < com::sun::star::beans::PropertyValue >&, bool, bool, int Pages = 0 );
     std::shared_ptr< vcl::PrinterController > GetPrinterController() const;
+
 
     void                        AddRemoveClipboardListener( const com::sun::star::uno::Reference < com::sun::star::datatransfer::clipboard::XClipboardListener>&, bool );
     ::com::sun::star::uno::Reference< ::com::sun::star::datatransfer::clipboard::XClipboardNotifier > GetClipboardNotifier();

@@ -523,6 +523,11 @@ public:
     */
     OUString makeEnabled( const OUString& rPropName );
 
+    /// call in setPrinter in this case all components ready
+    /// call in checkOptionalControlDependencies when changes in the checkbox
+    virtual void updatePrinterContr(int , int ) {}
+
+
     virtual int getPageCount() const = 0; /// App must override this
     /* get the page parameters, namely the jobsetup that should be active for the page
        (describing among others the physical page size) and the "page size". In writer
@@ -532,6 +537,9 @@ public:
        the paper size.
        App must override this, return page size in 1/100th mm
     */
+    virtual int CalculateNextPage(int StartPage, int SubPages, int SubPage, int Repeat);
+
+
     virtual css::uno::Sequence< css::beans::PropertyValue > getPageParameters( int i_nPage ) const = 0;
     virtual void printPage(int i_nPage) const = 0; /// App must override this
     virtual void jobStarted(); // will be called after a possible dialog has been shown and the real printjob starts
@@ -557,7 +565,7 @@ public:
     VCL_PLUGIN_PUBLIC void createProgressDialog();
     VCL_PLUGIN_PUBLIC bool isProgressCanceled() const;
     SAL_DLLPRIVATE void setMultipage( const MultiPageSetup& );
-    SAL_DLLPRIVATE const MultiPageSetup& getMultipage() const;
+    VCL_PLUGIN_PUBLIC const MultiPageSetup& getMultipage() const;
     VCL_PLUGIN_PUBLIC void setLastPage( bool i_bLastPage );
     SAL_DLLPRIVATE void setReversePrint( bool i_bReverse );
     SAL_DLLPRIVATE bool getReversePrint() const;
@@ -570,7 +578,7 @@ public:
     VCL_PLUGIN_PUBLIC void setJobState( com::sun::star::view::PrintableState );
     SAL_DLLPRIVATE bool setupPrinter( vcl::Window* i_pDlgParent );
 
-    SAL_DLLPRIVATE int getPageCountProtected() const;
+    VCL_PLUGIN_PUBLIC int getPageCountProtected() const;
     SAL_DLLPRIVATE css::uno::Sequence< css::beans::PropertyValue > getPageParametersProtected( int i_nPage ) const;
 
     SAL_DLLPRIVATE DrawModeFlags removeTransparencies( GDIMetaFile& i_rIn, GDIMetaFile& o_rOut );

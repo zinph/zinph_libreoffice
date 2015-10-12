@@ -1268,6 +1268,8 @@ void PrintDialog::checkOptionalControlDependencies()
         if( bShouldbeEnabled != bIsEnabled )
             it->first->Enable( bShouldbeEnabled );
     }
+
+    maPController->updatePrinterContr(1, 0);
 }
 
 static OUString searchAndReplace( const OUString& i_rOrig, const char* i_pRepl, sal_Int32 i_nReplLen, const OUString& i_rRepl )

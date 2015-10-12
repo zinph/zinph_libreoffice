@@ -794,6 +794,8 @@ void PrinterController::setPrinter( const VclPtr<Printer>& i_rPrinter )
     mpImplData->maDefaultPageSize = mpImplData->mxPrinter->GetPaperSize();
     mpImplData->mxPrinter->Pop();
     mpImplData->mnFixedPaperBin = -1;
+
+    updatePrinterContr(0, 0);
 }
 
 void PrinterController::resetPrinterOptions( bool i_bFileOutput )
@@ -1072,6 +1074,7 @@ PrinterController::PageSize PrinterController::getFilteredPageFile( int i_nFilte
         i_nFilteredPage = nDocPages - 1 - i_nFilteredPage;
     }
 
+
     // there is no filtering to be done (and possibly the page size of the
     // original page is to be set), when N-Up is "neutral" that is there is
     // only one subpage and the margins are 0
@@ -1079,7 +1082,10 @@ PrinterController::PageSize PrinterController::getFilteredPageFile( int i_nFilte
         rMPS.nLeftMargin == 0 && rMPS.nRightMargin == 0 &&
         rMPS.nTopMargin == 0 && rMPS.nBottomMargin == 0 )
     {
-        PrinterController::PageSize aPageSize = getPageFile( i_nFilteredPage, o_rMtf, i_bMayUseCache );
+
+        int StartPage = CalculateNextPage(i_nFilteredPage, nSubPages, 0,  1);
+
+        PrinterController::PageSize aPageSize = getPageFile( StartPage, o_rMtf, i_bMayUseCache );
         if (mpImplData->meJobState != view::PrintableState_JOB_STARTED)
         {   // rhbz#657394: check that we are still printing...
             return PrinterController::PageSize();
@@ -1136,7 +1142,8 @@ PrinterController::PageSize PrinterController::getFilteredPageFile( int i_nFilte
     for( int nSubPage = 0; nSubPage < nSubPages; nSubPage++ )
     {
         // map current sub page to real page
-        int nPage = (i_nFilteredPage * nSubPages + nSubPage) / rMPS.nRepeat;
+        int nPage = CalculateNextPage(i_nFilteredPage, nSubPages, nSubPage, rMPS.nRepeat);
+
         if( nSubPage == nSubPages-1 ||
             nPage == nDocPages-1 )
         {
@@ -1199,6 +1206,11 @@ PrinterController::PageSize PrinterController::getFilteredPageFile( int i_nFilte
     mpImplData->mxPrinter->SetPaperSizeUser( aPaperSize, ! mpImplData->isFixedPageSize() );
 
     return PrinterController::PageSize( aPaperSize, true );
+}
+
+int PrinterController::CalculateNextPage(int StartPage, int SubPages, int SubPage, int Repeat)
+{
+    return (StartPage * SubPages + SubPage) / Repeat;
 }
 
 int PrinterController::getFilteredPageCount()

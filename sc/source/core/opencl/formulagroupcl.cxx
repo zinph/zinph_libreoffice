@@ -1733,13 +1733,8 @@ public:
                 assert(pCur);
                 assert(pCur->GetType() != formula::svDoubleVectorRef);
 
-                if (pCur->GetType() == formula::svSingleVectorRef)
-                {
-                    const formula::SingleVectorRefToken* pSVR =
-                        static_cast<const formula::SingleVectorRefToken*>(pCur);
-                    ss << "if (gid0 < " << pSVR->GetArrayLength() << "){\n";
-                }
-                else if (pCur->GetType() == formula::svDouble)
+                if (pCur->GetType() == formula::svSingleVectorRef ||
+                    pCur->GetType() == formula::svDouble)
                 {
                     ss << "{\n";
                 }
@@ -1770,13 +1765,6 @@ public:
                 ss << ";\n";
                 ss << "    }\n";
                 ss << "}\n";
-                if (vSubArguments[i]->GetFormulaToken()->GetType() ==
-                        formula::svSingleVectorRef && ZeroReturnZero())
-                {
-                    ss << "else{\n";
-                    ss << "        return 0;\n";
-                    ss << "    }\n";
-                }
             }
             else
             {

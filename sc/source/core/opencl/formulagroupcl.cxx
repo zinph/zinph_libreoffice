@@ -1773,6 +1773,10 @@ public:
                 ss << ";\n";
             }
         }
+        if (isAverage())
+            ss <<
+                "if (nCount==0)\n"
+                "    return CreateDoubleError(errDivisionByZero);\n";
         ss << "return tmp";
         if (isAverage())
             ss << "*pow((double)nCount,-1.0)";
@@ -2121,7 +2125,7 @@ public:
         ss << "fsum_count(" << lhs << "," << rhs << ", &nCount)";
         return ss.str();
     }
-    virtual std::string BinFuncName() const SAL_OVERRIDE { return "fsum"; }
+    virtual std::string BinFuncName() const SAL_OVERRIDE { return "average"; }
     virtual bool isAverage() const SAL_OVERRIDE { return true; }
 };
 

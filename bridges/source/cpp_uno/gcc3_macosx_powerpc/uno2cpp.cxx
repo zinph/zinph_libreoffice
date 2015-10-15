@@ -303,7 +303,7 @@ static void callVirtualMethod(
 
 static void cpp_call(
     bridges::cpp_uno::shared::UnoInterfaceProxy * pThis,
-    bridges::cpp_uno::shared::VtableSlot  aVtableSlot,
+    bridges::cpp_uno::shared::VtableSlot aVtableSlot,
     typelib_TypeDescriptionReference * pReturnTypeRef,
     sal_Int32 nParams, typelib_MethodParameter * pParams,
     void * pUnoReturn, void * pUnoArgs[], uno_Any ** ppUnoExc )
@@ -320,7 +320,7 @@ static void cpp_call(
     // return
     typelib_TypeDescription * pReturnTypeDescr = 0;
     TYPELIB_DANGER_GET( &pReturnTypeDescr, pReturnTypeRef );
-    // assert( pReturnTypeDescr && "### expected return type description!" );
+    //assert( pReturnTypeDescr && "### expected return type description!" );
 
     void * pCppReturn = 0; // if != 0 && != pUnoReturn, needs reconversion
 
@@ -341,13 +341,13 @@ static void cpp_call(
         }
     }
     // push this
-        void* pAdjustedThisPtr = reinterpret_cast< void **>(pThis->getCppI()) + aVtableSlot.offset;
+    void * pAdjustedThisPtr = reinterpret_cast< void ** >(pThis->getCppI()) + aVtableSlot.offset;
     *(void**)pCppStack = pAdjustedThisPtr;
     pCppStack += sizeof( void* );
         *pPT++ = 'I';
 
     // stack space
-    // assert( sizeof(void *) == sizeof(sal_Int32) && "### unexpected size!" );
+    //assert( sizeof(void *) == sizeof(sal_Int32) && "### unexpected size!" );
     // args
     void ** pCppArgs  = (void **)alloca( 3 * sizeof(void *) * nParams );
     // indices of values this have to be converted (interface conversion cpp<=>uno)
@@ -430,8 +430,7 @@ static void cpp_call(
             {
                 uno_copyAndConvertData(
                     *(void **)pCppStack = pCppArgs[nPos] = alloca( pParamTypeDescr->nSize ),
-                    pUnoArgs[nPos], pParamTypeDescr,
-                                        pThis->getBridge()->getUno2Cpp() );
+                    pUnoArgs[nPos], pParamTypeDescr, pThis->getBridge()->getUno2Cpp() );
 
                 pTempIndices[nTempIndices] = nPos; // has to be reconverted
                 // will be released at reconversion
@@ -499,8 +498,7 @@ static void cpp_call(
      catch (...)
      {
           // fill uno exception
-        fillUnoException( CPPU_CURRENT_NAMESPACE::__cxa_get_globals()->caughtExceptions,
-                                  *ppUnoExc, pThis->getBridge()->getCpp2Uno() );
+        fillUnoException( CPPU_CURRENT_NAMESPACE::__cxa_get_globals()->caughtExceptions, *ppUnoExc, pThis->getBridge()->getCpp2Uno() );
 
         // temporary params
         for ( ; nTempIndices--; )
@@ -525,8 +523,8 @@ void unoInterfaceProxyDispatch(
     void * pReturn, void * pArgs[], uno_Any ** ppException )
 {
     // is my surrogate
-        bridges::cpp_uno::shared::UnoInterfaceProxy * pThis
-            = static_cast< bridges::cpp_uno::shared::UnoInterfaceProxy *> (pUnoI);
+    bridges::cpp_uno::shared::UnoInterfaceProxy * pThis
+            = static_cast< bridges::cpp_uno::shared::UnoInterfaceProxy * > (pUnoI);
 
     switch (pMemberDescr->eTypeClass)
     {

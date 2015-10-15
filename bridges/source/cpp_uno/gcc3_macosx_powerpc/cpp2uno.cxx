@@ -49,7 +49,7 @@ static typelib_TypeClass cpp2uno_call(
 
         // gpreg:  [ret *], this, [gpr params]
         // fpreg:  [fpr params]
-        // ovrflw: [gpr or fpr params (properly aligned)]
+        // ovrflw: [gpr or fpr params (space for entire parameter list aligned)]
 
     // return
     typelib_TypeDescription * pReturnTypeDescr = 0;
@@ -83,11 +83,14 @@ static typelib_TypeClass cpp2uno_call(
 
     // stack space
     assert( sizeof(void *) == sizeof(sal_Int32) && "### unexpected size!" );
+
     // parameters
     void ** pUnoArgs = (void **)alloca( 4 * sizeof(void *) * nParams );
     void ** pCppArgs = pUnoArgs + nParams;
+
     // indices of values this have to be converted (interface conversion cpp<=>uno)
     sal_Int32 * pTempIndices = (sal_Int32 *)(pUnoArgs + (2 * nParams));
+
     // type descriptions for reconversions
     typelib_TypeDescription ** ppTempParamTypeDescr = (typelib_TypeDescription **)(pUnoArgs + (3 * nParams));
 
@@ -102,7 +105,6 @@ static typelib_TypeClass cpp2uno_call(
         if (!rParam.bOut && bridges::cpp_uno::shared::isSimpleType( pParamTypeDescr ))
                 // value
         {
-
             switch (pParamTypeDescr->eTypeClass)
             {
 
@@ -524,8 +526,8 @@ static void cpp_vtable_call( int nFunctionIndex, int nVtableOffset, void** gpreg
 
 int const codeSnippetSize = 136;
 
-unsigned char *  codeSnippet( unsigned char * code, sal_Int32 functionIndex, sal_Int32 vtableOffset,
-                              bool simpleRetType)
+unsigned char * codeSnippet( unsigned char * code, sal_Int32 functionIndex,
+                  sal_Int32 vtableOffset, bool simpleRetType )
 {
 
   // fprintf(stderr,"in codeSnippet functionIndex is %x\n", functionIndex);
@@ -679,8 +681,9 @@ unsigned char * bridges::cpp_uno::shared::VtableFactory::addLocalFunctions(
     typelib_InterfaceTypeDescription const * type, sal_Int32 functionOffset,
     sal_Int32 functionCount, sal_Int32 vtableOffset)
 {
-     (*slots) -= functionCount;
-     Slot * s = *slots;
+    (*slots) -= functionCount;
+    Slot * s = *slots;
+
   // fprintf(stderr, "in addLocalFunctions functionOffset is %x\n",functionOffset);
   // fprintf(stderr, "in addLocalFunctions vtableOffset is %x\n",vtableOffset);
   // fflush(stderr);

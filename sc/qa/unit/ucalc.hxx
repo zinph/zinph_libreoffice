@@ -523,7 +523,9 @@ public:
     CPPUNIT_TEST(testFuncIF);
     CPPUNIT_TEST(testFuncCHOOSE);
     CPPUNIT_TEST(testFuncIFERROR);
+#if !( defined(MACOSX) && (MACOSX_SDK_VERSION < 1060) )
     CPPUNIT_TEST(testFuncGETPIVOTDATA);
+#endif
     CPPUNIT_TEST(testFuncGETPIVOTDATALeafAccess);
     CPPUNIT_TEST(testMatrixOp);
     CPPUNIT_TEST(testFuncRangeOp);
@@ -567,20 +569,30 @@ public:
     CPPUNIT_TEST(testPivotTable);
     CPPUNIT_TEST(testPivotTableLabels);
     CPPUNIT_TEST(testPivotTableDateLabels);
+#if !( defined(MACOSX) && (MACOSX_SDK_VERSION < 1060) )
     CPPUNIT_TEST(testPivotTableFilters);
+#endif
     CPPUNIT_TEST(testPivotTableNamedSource);
     CPPUNIT_TEST(testPivotTableCache);
+#if !( defined(MACOSX) && (MACOSX_SDK_VERSION < 1060) )
     CPPUNIT_TEST(testPivotTableDuplicateDataFields);
+#endif
     CPPUNIT_TEST(testPivotTableNormalGrouping);
     CPPUNIT_TEST(testPivotTableNumberGrouping);
     CPPUNIT_TEST(testPivotTableDateGrouping);
     CPPUNIT_TEST(testPivotTableEmptyRows);
+#if !( defined(MACOSX) && (MACOSX_SDK_VERSION < 1060) )
     CPPUNIT_TEST(testPivotTableTextNumber);
+#endif
     CPPUNIT_TEST(testPivotTableCaseInsensitiveStrings);
     CPPUNIT_TEST(testPivotTableNumStability);
+#if !( defined(MACOSX) && (MACOSX_SDK_VERSION < 1060) )
     CPPUNIT_TEST(testPivotTableFieldReference);
+#endif
     CPPUNIT_TEST(testPivotTableDocFunc);
+#if !( defined(MACOSX) && (MACOSX_SDK_VERSION < 1060) )
     CPPUNIT_TEST(testPivotTableRepeatItemLabels);
+#endif
     CPPUNIT_TEST(testCellCopy);
     CPPUNIT_TEST(testSheetCopy);
     CPPUNIT_TEST(testSheetMove);

@@ -348,7 +348,7 @@ sub get_download_platformname
     }
     elsif ( $installer::globals::ismacbuild )
     {
-        $platformname = "MacOS";
+        $platformname = "MacOSX";
     }
     else
     {

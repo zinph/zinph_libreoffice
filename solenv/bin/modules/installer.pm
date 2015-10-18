@@ -234,9 +234,8 @@ sub run {
     if ( $installer::globals::iswindowsbuild ) { installer::control::read_lcidlist($includepatharrayref); }
 
     ####################################################################
-    # MacOS dmg build requires special DS_Store file to arrange icons
+    # MacOSX dmg build uses .DS_Store file for Finder to arrange icons
     ####################################################################
-    # if (($installer::globals::ismacdmgbuild) && ($installer::globals::product eq "OpenOffice_Dev")) { $installer::globals::devsnapshotbuild = 1; }
 
     #####################################################################
     # Including additional inc files for variable settings, if defined
@@ -326,7 +325,6 @@ sub run {
 
     if ( $installer::globals::languagepack ) { installer::scriptitems::use_langpack_copy_scpaction($scpactionsinproductarrayref); }
     if ( $installer::globals::helppack ) { installer::scriptitems::use_langpack_copy_scpaction($scpactionsinproductarrayref); }
-#   if (($installer::globals::devsnapshotbuild)) { installer::scriptitems::use_dev_copy_scpaction($scpactionsinproductarrayref); }
     # TODO: why is this not done in scp2 based on the value of $(ENABLE_RELEASE_BUILD)?
     if ( $allvariableshashref->{'PRODUCTNAME'} eq "LibreOfficeDev" ) { installer::scriptitems::use_devversion_copy_scpaction($scpactionsinproductarrayref); }
 

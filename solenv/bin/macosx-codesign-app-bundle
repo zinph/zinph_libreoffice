@@ -52,13 +52,13 @@ while read dylib; do \
     codesign --verbose --identifier=$MACOSX_BUNDLE_IDENTIFIER.$id --sign "$MACOSX_CODESIGNING_IDENTITY" "$dylib" || exit 1
 done
 
-# The executables have already been signed by
-# gb_LinkTarget__command_dynamiclink in
-# solenv/gbuild/platform/macosx.mk, but sign the handful of scripts remaining
-# in MacOS
-# (<https://developer.apple.com/library/mac/technotes/tn2206/_index.html> "OS X
+# The executables have already been signed by gb_LinkTarget__command_dynamiclink
+# in solenv/gbuild/platform/macosx.mk, but sign the handful of scripts remaining
+# in Contents/MacOS/
+#
+# <https://developer.apple.com/library/mac/technotes/tn2206/_index.html> "OS X
 # Code Signing In Depth" suggests we should get rid of them rather sooner than
-# later, but they appear to be OK for now):
+# later, but they appear to be OK for now
 
 for i in gengal python senddoc unoinfo
 do

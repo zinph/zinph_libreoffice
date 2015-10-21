@@ -3755,6 +3755,8 @@ void SAL_CALL SfxBaseModel::storeToStorage( const Reference< embed::XStorage >& 
             Exception,
             RuntimeException, std::exception )
 {
+    SAL_INFO( "sfx2.doc", "entering >>SfxBaseModel::storeToStorage<<" );
+
     SfxModelGuard aGuard( *this );
 
     Reference< embed::XStorage > xResult;
@@ -3781,11 +3783,13 @@ void SAL_CALL SfxBaseModel::storeToStorage( const Reference< embed::XStorage >& 
         // storing to the own storage
         bSuccess = m_pData->m_pObjectShell->DoSave();
     }
-    else
+    else /* xStorage != m_pData->m_pObjectShell->GetStorage() */
     {
         // TODO/LATER: if the provided storage has some data inside the storing might fail, probably the storage must be truncated
         // TODO/LATER: is it possible to have a template here?
-        m_pData->m_pObjectShell->SetupStorage( xStorage, nVersion, false );
+        try {
+            m_pData->m_pObjectShell->SetupStorage( xStorage, nVersion, false );
+        } catch ( ... ) { }
 
         // BaseURL is part of the ItemSet
         SfxMedium aMedium( xStorage, OUString(), &aSet );
@@ -3806,8 +3810,8 @@ void SAL_CALL SfxBaseModel::storeToStorage( const Reference< embed::XStorage >& 
     {
         nError = nError ? nError : ERRCODE_IO_GENERAL;
         throw task::ErrorCodeIOException(
-            "SfxBaseModel::storeToStorage: 0x" + OUString::number(nError, 16),
-            Reference< XInterface >(), nError);
+            "SfxBaseModel::storeToStorage: $" + OUString::number(nError, 16),
+            Reference< XInterface >(), nError );
     }
 }
 

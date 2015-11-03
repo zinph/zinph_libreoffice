@@ -26,7 +26,10 @@
 #include "mtvcellfunc.hxx"
 #include "scmatrix.hxx"
 
+#include "arraysumfunctor.hxx"
+
 #include <formula/token.hxx>
+
 
 using namespace formula;
 
@@ -224,18 +227,11 @@ public:
             {
                 const puncture_mdds_encap *pBlock = static_cast<const puncture_mdds_encap *>(rNode.data);
                 const double *p = pBlock->getPtr(nOffset);
-                size_t i, nUnrolled = (nDataSize & 0x3) >> 2;
 
-                // Try to encourage the compiler/CPU to do something sensible (?)
-                for (i = 0; i < nUnrolled; i+=4)
-                {
-                    mfSum += p[i];
-                    mfSum += p[i+1];
-                    mfSum += p[i+2];
-                    mfSum += p[i+3];
-                }
-                for (; i < nDataSize; ++i)
-                    mfSum += p[i];
+                sc::ArraySumFunctor functor(p, nDataSize);
+
+                mfSum += functor();
+
                 break;
             }
 

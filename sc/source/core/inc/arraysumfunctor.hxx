@@ -17,6 +17,12 @@
 namespace sc
 {
 
+template<typename T, unsigned int N>
+inline bool isAligned(const T* pointer)
+{
+    return 0 == (uintptr_t(pointer) % N);
+}
+
 struct ArraySumFunctor
 {
 private:
@@ -30,18 +36,26 @@ public:
     {
     }
 
-    double operator() () const
+    double operator() ()
     {
         static bool hasSSE2 = tools::cpuid::hasSSE2();
         printf("SSE used %d\n", hasSSE2);
 
         double fSum = 0.0;
         size_t i = 0;
+        const double* pCurrent = mpArray;
 
         if (hasSSE2)
-            fSum += executeSSE2(i);
+        {
+            while (!isAligned<double, 16>(pCurrent))
+            {
+                fSum += *pCurrent++;
+                i++;
+            }
+            fSum += executeSSE2(i, pCurrent);
+        }
         else
-            fSum += executeUnrolled(i);
+            fSum += executeUnrolled(i, pCurrent);
 
         // sum rest of the array
 
@@ -52,27 +66,34 @@ public:
     }
 
 private:
-    inline double executeSSE2(size_t& i) const
+    inline double executeSSE2(size_t& i, const double* pCurrent) const
     {
         double fSum = 0.0;
-        size_t nUnrolledSize = mnSize - (mnSize % 4);
+        size_t nRealSize = mnSize - i;
+        size_t nUnrolledSize = nRealSize - (nRealSize % 8);
 
         if (nUnrolledSize > 0)
         {
-            register __m128d sum1 = _mm_set_pd(0.0, 0.0);
-            register __m128d sum2 = _mm_set_pd(0.0, 0.0);
+            __m128d sum1 = _mm_setzero_pd();
+            __m128d sum2 = _mm_setzero_pd();
+            __m128d sum3 = _mm_setzero_pd();
+            __m128d sum4 = _mm_setzero_pd();
 
-            const double* pCurrent = mpArray;
-
-            for (; i < nUnrolledSize; i += 4)
+            for (; i < nUnrolledSize; i += 8)
             {
-                sum1 = _mm_add_pd(sum1, _mm_loadu_pd(pCurrent));
-                pCurrent += 2;
+                __m128d load1 = _mm_load_pd(&pCurrent[i]);
+                sum1 = _mm_add_pd(sum1, load1);
 
-                sum2 = _mm_add_pd(sum2, _mm_loadu_pd(pCurrent));
-                pCurrent += 2;
+                __m128d load2 = _mm_load_pd(&pCurrent[i + 2]);
+                sum2 = _mm_add_pd(sum2, load2);
+
+                __m128d load3 = _mm_load_pd(&pCurrent[i + 4]);
+                sum3 = _mm_add_pd(sum3, load3);
+
+                __m128d load4 = _mm_load_pd(&pCurrent[i + 6]);
+                sum4 = _mm_add_pd(sum4, load4);
             }
-            sum1 = _mm_add_pd(sum1, sum2);
+            sum1 = _mm_add_pd(_mm_add_pd(sum1, sum2), _mm_add_pd(sum3, sum4));
 
             double temp;
 
@@ -85,9 +106,10 @@ private:
         return fSum;
     }
 
-    inline double executeUnrolled(size_t& i) const
+    inline double executeUnrolled(size_t& i, const double* pCurrent) const
     {
-        size_t nUnrolledSize = mnSize - (mnSize % 4);
+        size_t nRealSize = mnSize - i;
+        size_t nUnrolledSize = nRealSize - (nRealSize % 4);
 
         if (nUnrolledSize > 0)
         {
@@ -95,8 +117,6 @@ private:
             double sum1 = 0.0;
             double sum2 = 0.0;
             double sum3 = 0.0;
-
-            const double* pCurrent = mpArray;
 
             for (; i < nUnrolledSize; i += 4)
             {

@@ -39,7 +39,6 @@ public:
     double operator() ()
     {
         static bool hasSSE2 = tools::cpuid::hasSSE2();
-        printf("SSE used %d\n", hasSSE2);
 
         double fSum = 0.0;
         size_t i = 0;
@@ -81,17 +80,21 @@ private:
 
             for (; i < nUnrolledSize; i += 8)
             {
-                __m128d load1 = _mm_load_pd(&pCurrent[i]);
+                __m128d load1 = _mm_load_pd(pCurrent);
                 sum1 = _mm_add_pd(sum1, load1);
+                pCurrent += 2;
 
-                __m128d load2 = _mm_load_pd(&pCurrent[i + 2]);
+                __m128d load2 = _mm_load_pd(pCurrent);
                 sum2 = _mm_add_pd(sum2, load2);
+                pCurrent += 2;
 
-                __m128d load3 = _mm_load_pd(&pCurrent[i + 4]);
+                __m128d load3 = _mm_load_pd(pCurrent);
                 sum3 = _mm_add_pd(sum3, load3);
+                pCurrent += 2;
 
-                __m128d load4 = _mm_load_pd(&pCurrent[i + 6]);
+                __m128d load4 = _mm_load_pd(pCurrent);
                 sum4 = _mm_add_pd(sum4, load4);
+                pCurrent += 2;
             }
             sum1 = _mm_add_pd(_mm_add_pd(sum1, sum2), _mm_add_pd(sum3, sum4));
 

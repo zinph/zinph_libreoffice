@@ -26,7 +26,10 @@
 #include "mtvcellfunc.hxx"
 #include "scmatrix.hxx"
 
+#include "arraysumfunctor.hxx"
+
 #include <formula/token.hxx>
+
 
 using namespace formula;
 
@@ -203,6 +206,11 @@ double ScInterpreter::GetGammaDist( double fX, double fAlpha, double fLambda )
 
 namespace {
 
+// this is unpleasant - but ... we want raw access.
+struct puncture_mdds_encap : public sc::numeric_block {
+    const double *getPtr(size_t nOffset) const { return &m_array[nOffset]; }
+};
+
 class NumericCellAccumulator
 {
     double mfSum;
@@ -211,32 +219,51 @@ class NumericCellAccumulator
 public:
     NumericCellAccumulator() : mfSum(0.0), mnError(0) {}
 
-    void operator() (size_t, double fVal)
+    void operator() (const sc::CellStoreType::value_type& rNode, size_t nOffset, size_t nDataSize)
     {
-        mfSum += fVal;
-    }
-
-    void operator() (size_t, const ScFormulaCell* pCell)
-    {
-        if (mnError)
-            // Skip all the rest if we have an error.
-            return;
-
-        double fVal = 0.0;
-        sal_uInt16 nErr = 0;
-        ScFormulaCell& rCell = const_cast<ScFormulaCell&>(*pCell);
-        if (!rCell.GetErrorOrValue(nErr, fVal))
-            // The cell has neither error nor value.  Perhaps string result.
-            return;
-
-        if (nErr)
+        switch (rNode.type)
         {
-            // Cell has error.
-            mnError = nErr;
-            return;
-        }
+            case sc::element_type_numeric:
+            {
+                const puncture_mdds_encap *pBlock = static_cast<const puncture_mdds_encap *>(rNode.data);
+                const double *p = pBlock->getPtr(nOffset);
 
-        mfSum += fVal;
+                sc::ArraySumFunctor functor(p, nDataSize);
+
+                mfSum += functor();
+
+                break;
+            }
+
+            case sc::element_type_formula:
+            {
+                sc::formula_block::const_iterator it = sc::formula_block::begin(*rNode.data);
+                std::advance(it, nOffset);
+                sc::formula_block::const_iterator itEnd = it;
+                std::advance(itEnd, nDataSize);
+                for (; it != itEnd; ++it)
+                {
+                    double fVal = 0.0;
+                    sal_uInt16 nErr = 0;
+                    ScFormulaCell& rCell = const_cast<ScFormulaCell&>(*(*it));
+                    if (!rCell.GetErrorOrValue(nErr, fVal))
+                        // The cell has neither error nor value.  Perhaps string result.
+                        continue;
+
+                    if (nErr)
+                    {
+                        // Cell has error - skip all the rest
+                        mnError = nErr;
+                        return;
+                    }
+
+                    mfSum += fVal;
+                }
+            }
+            break;
+            default:
+                ;
+        }
     }
 
     sal_uInt16 getError() const { return mnError; }
@@ -335,7 +362,7 @@ public:
             return;
 
         NumericCellAccumulator aFunc;
-        maPos.miCellPos = sc::ParseFormulaNumeric(maPos.miCellPos, mpCol->GetCellStore(), nRow1, nRow2, aFunc);
+        maPos.miCellPos = sc::ParseBlock(maPos.miCellPos, mpCol->GetCellStore(), aFunc, nRow1, nRow2);
         mnError = aFunc.getError();
         if (mnError)
             return;

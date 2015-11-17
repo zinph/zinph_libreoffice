@@ -3879,9 +3879,6 @@ bool ScFormulaCell::InterpretFormulaGroup()
             return false;
     }
 
-    if (!ScCalcConfig::isOpenCLEnabled())
-        return false;
-
     // TODO : Disable invariant formula group interpretation for now in order
     // to get implicit intersection to work.
     if (mxGroup->mbInvariant && false)

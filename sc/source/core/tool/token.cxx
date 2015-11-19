@@ -1321,6 +1321,12 @@ void ScTokenArray::CheckToken( const FormulaToken& r )
             return;
         }
 
+        if (!ScCalcConfig::isOpenCLEnabled() && ScInterpreter::GetGlobalConfig().mpSwInterpreterSubsetOpCodes->find(eOp) == ScInterpreter::GetGlobalConfig().mpSwInterpreterSubsetOpCodes->end())
+        {
+            meVectorState = FormulaVectorDisabled;
+            return;
+        }
+
         // We support vectorization for the following opcodes.
         switch (eOp)
         {
@@ -1557,6 +1563,15 @@ void ScTokenArray::CheckToken( const FormulaToken& r )
         eOp <= SC_OPCODE_STOP_UN_OP &&
         ScInterpreter::GetGlobalConfig().mbOpenCLSubsetOnly &&
         ScInterpreter::GetGlobalConfig().mpOpenCLSubsetOpCodes->find(eOp) == ScInterpreter::GetGlobalConfig().mpOpenCLSubsetOpCodes->end())
+    {
+        meVectorState = FormulaVectorDisabled;
+        return;
+    }
+
+    if (eOp >= SC_OPCODE_START_BIN_OP &&
+        eOp <= SC_OPCODE_STOP_UN_OP &&
+        !ScCalcConfig::isOpenCLEnabled() &&
+        ScInterpreter::GetGlobalConfig().mpSwInterpreterSubsetOpCodes->find(eOp) == ScInterpreter::GetGlobalConfig().mpSwInterpreterSubsetOpCodes->end())
     {
         meVectorState = FormulaVectorDisabled;
         return;
@@ -1942,7 +1957,7 @@ FormulaToken* ScTokenArray::MergeArray( )
         return nullptr;
 
     int nSign = 1;
-    ScMatrix* pArray = new ScMatrix(nCol, nRow, 0.0);
+    ScMatrix* pArray = new ScFullMatrix(nCol, nRow, 0.0);
     for ( i = nStart, nCol = 0, nRow = 0 ; i < nLen ; i++ )
     {
         t = pCode[i];

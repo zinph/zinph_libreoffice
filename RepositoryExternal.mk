@@ -3382,11 +3382,6 @@ endif
 
 $(call gb_LinkTarget_use_external_project,$(1),breakpad)
 
-$(eval $(call gb_Helper_register_packages_for_install,ooo,\
-	breakpad \
-))
-
-
 endef
 
 # else # SYSTEM_LIBBREAKPAD

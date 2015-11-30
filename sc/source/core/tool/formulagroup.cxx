@@ -138,156 +138,6 @@ FormulaGroupContext::~FormulaGroupContext()
 {
 }
 
-namespace {
-
-/**
- * Input double array consists of segments of NaN's and normal values.
- * Insert only the normal values into the matrix while skipping the NaN's.
- */
-void fillMatrix( ScMatrix& rMat, size_t nCol, const double* pNums, size_t nLen )
-{
-    const double* pNum = pNums;
-    const double* pNumEnd = pNum + nLen;
-    const double* pNumHead = nullptr;
-    for (; pNum != pNumEnd; ++pNum)
-    {
-        if (!rtl::math::isNan(*pNum))
-        {
-            if (!pNumHead)
-                // Store the first non-NaN position.
-                pNumHead = pNum;
-
-            continue;
-        }
-
-        if (pNumHead)
-        {
-            // Flush this non-NaN segment to the matrix.
-            rMat.PutDouble(pNumHead, pNum - pNumHead, nCol, pNumHead - pNums);
-            pNumHead = nullptr;
-        }
-    }
-
-    if (pNumHead)
-    {
-        // Flush last non-NaN segment to the matrix.
-        rMat.PutDouble(pNumHead, pNum - pNumHead, nCol, pNumHead - pNums);
-    }
-}
-
-void flushStrSegment(
-    ScMatrix& rMat, size_t nCol, rtl_uString** pHead, rtl_uString** pCur, rtl_uString** pTop )
-{
-    size_t nOffset = pHead - pTop;
-    std::vector<svl::SharedString> aStrs;
-    aStrs.reserve(pCur - pHead);
-    for (; pHead != pCur; ++pHead)
-        aStrs.push_back(svl::SharedString(*pHead, *pHead));
-
-    rMat.PutString(&aStrs[0], aStrs.size(), nCol, nOffset);
-}
-
-void fillMatrix( ScMatrix& rMat, size_t nCol, rtl_uString** pStrs, size_t nLen )
-{
-    rtl_uString** p = pStrs;
-    rtl_uString** pEnd = p + nLen;
-    rtl_uString** pHead = nullptr;
-    for (; p != pEnd; ++p)
-    {
-        if (*p)
-        {
-            if (!pHead)
-                // Store the first non-empty string position.
-                pHead = p;
-
-            continue;
-        }
-
-        if (pHead)
-        {
-            // Flush this non-empty segment to the matrix.
-            flushStrSegment(rMat, nCol, pHead, p, pStrs);
-            pHead = nullptr;
-        }
-    }
-
-    if (pHead)
-    {
-        // Flush last non-empty segment to the matrix.
-        flushStrSegment(rMat, nCol, pHead, p, pStrs);
-    }
-}
-
-void fillMatrix( ScMatrix& rMat, size_t nCol, const double* pNums, rtl_uString** pStrs, size_t nLen )
-{
-    if (!pStrs)
-    {
-        fillMatrix(rMat, nCol, pNums, nLen);
-        return;
-    }
-
-    const double* pNum = pNums;
-    const double* pNumHead = nullptr;
-    rtl_uString** pStr = pStrs;
-    rtl_uString** pStrEnd = pStr + nLen;
-    rtl_uString** pStrHead = nullptr;
-
-    for (; pStr != pStrEnd; ++pStr, ++pNum)
-    {
-        if (*pStr)
-        {
-            // String cell exists.
-
-            if (pNumHead)
-            {
-                // Flush this numeric segment to the matrix.
-                rMat.PutDouble(pNumHead, pNum - pNumHead, nCol, pNumHead - pNums);
-                pNumHead = nullptr;
-            }
-
-            if (!pStrHead)
-                // Store the first non-empty string position.
-                pStrHead = pStr;
-
-            continue;
-        }
-
-        // No string cell. Check the numeric cell value.
-
-        if (pStrHead)
-        {
-            // Flush this non-empty string segment to the matrix.
-            flushStrSegment(rMat, nCol, pStrHead, pStr, pStrs);
-            pStrHead = nullptr;
-        }
-
-        if (!rtl::math::isNan(*pNum))
-        {
-            // Numeric cell exists.
-            if (!pNumHead)
-                // Store the first non-NaN position.
-                pNumHead = pNum;
-
-            continue;
-        }
-
-        // Empty cell. No action required.
-    }
-
-    if (pStrHead)
-    {
-        // Flush the last non-empty segment to the matrix.
-        flushStrSegment(rMat, nCol, pStrHead, pStr, pStrs);
-    }
-    else if (pNumHead)
-    {
-        // Flush the last numeric segment to the matrix.
-        rMat.PutDouble(pNumHead, pNum - pNumHead, nCol, pNumHead - pNums);
-    }
-}
-
-}
-
 CompiledFormula::CompiledFormula() {}
 
 CompiledFormula::~CompiledFormula() {}
@@ -369,8 +219,6 @@ bool FormulaGroupInterpreterSoftware::interpret(ScDocument& rDoc, const ScAddres
                 case formula::svDoubleVectorRef:
                 {
                     const formula::DoubleVectorRefToken* p2 = static_cast<const formula::DoubleVectorRefToken*>(p);
-                    //const std::vector<formula::VectorRefArray>& rArrays = p2->GetArrays();
-                    //size_t nColSize = rArrays.size();
                     size_t nRowStart = p2->IsStartFixed() ? 0 : i;
                     size_t nRowEnd = p2->GetRefRowSize() - 1;
                     if (!p2->IsEndFixed())
@@ -378,50 +226,6 @@ bool FormulaGroupInterpreterSoftware::interpret(ScDocument& rDoc, const ScAddres
 
                     assert(nRowStart <= nRowEnd);
                     ScMatrixRef pMat(new ScVectorRefMatrix(p2, nRowStart, nRowEnd - nRowStart + 1));
-
-                    /*
-                    size_t nRowSize = nRowEnd - nRowStart + 1;
-                    ScMatrixRef pMat(new ScFullMatrix(nColSize, nRowSize));
-
-                    size_t nDataRowEnd = p2->GetArrayLength() - 1;
-                    if (nRowStart > nDataRowEnd)
-                        // Referenced rows are all empty.
-                        nRowSize = 0;
-                    else if (nRowEnd > nDataRowEnd)
-                        // Data array is shorter than the row size of the reference. Truncate it to the data.
-                        nRowSize -= nRowEnd - nDataRowEnd;
-
-                    for (size_t nCol = 0; nCol < nColSize; ++nCol)
-                    {
-                        const formula::VectorRefArray& rArray = rArrays[nCol];
-                        if (rArray.mpStringArray)
-                        {
-                            if (rArray.mpNumericArray)
-                            {
-                                // Mixture of string and numeric values.
-                                const double* pNums = rArray.mpNumericArray;
-                                pNums += nRowStart;
-                                rtl_uString** pStrs = rArray.mpStringArray;
-                                pStrs += nRowStart;
-                                fillMatrix(*pMat, nCol, pNums, pStrs, nRowSize);
-                            }
-                            else
-                            {
-                                // String cells only.
-                                rtl_uString** pStrs = rArray.mpStringArray;
-                                pStrs += nRowStart;
-                                fillMatrix(*pMat, nCol, pStrs, nRowSize);
-                            }
-                        }
-                        else if (rArray.mpNumericArray)
-                        {
-                            // Numeric cells only.
-                            const double* pNums = rArray.mpNumericArray;
-                            pNums += nRowStart;
-                            fillMatrix(*pMat, nCol, pNums, nRowSize);
-                        }
-                    }
-                    */
 
                     if (p2->IsStartFixed() && p2->IsEndFixed())
                     {
@@ -477,13 +281,14 @@ FormulaGroupInterpreter *FormulaGroupInterpreter::getStatic()
     if ( !msInstance )
     {
 #if HAVE_FEATURE_OPENCL
-        const ScCalcConfig& rConfig = ScInterpreter::GetGlobalConfig();
         if (ScCalcConfig::isOpenCLEnabled())
+        {
+            const ScCalcConfig& rConfig = ScInterpreter::GetGlobalConfig();
             switchOpenCLDevice(rConfig.maOpenCLDevice, rConfig.mbOpenCLAutoSelect);
+        }
 #endif
-        static bool bAllowSoftwareInterpreter = true;
 
-        if ( !msInstance && bAllowSoftwareInterpreter ) // software fallback
+        if (!msInstance && ScCalcConfig::isSwInterpreterEnabled()) // software interpreter
         {
             SAL_INFO("sc.formulagroup", "Create S/W interpreter");
             msInstance = new sc::FormulaGroupInterpreterSoftware();
@@ -505,20 +310,26 @@ void FormulaGroupInterpreter::fillOpenCLInfo(std::vector<OpenCLPlatformInfo>& rP
 bool FormulaGroupInterpreter::switchOpenCLDevice(const OUString& rDeviceId, bool bAutoSelect, bool bForceEvaluation)
 {
     bool bOpenCLEnabled = ScCalcConfig::isOpenCLEnabled();
-    static bool bAllowSoftwareInterpreter = true;
-    if (!bOpenCLEnabled || (bAllowSoftwareInterpreter && rDeviceId == OPENCL_SOFTWARE_DEVICE_CONFIG_NAME))
+    if (!bOpenCLEnabled || (rDeviceId == OPENCL_SOFTWARE_DEVICE_CONFIG_NAME))
     {
-        if(msInstance)
+        bool bSwInterpreterEnabled = ScCalcConfig::isSwInterpreterEnabled();
+        if (msInstance)
         {
             // if we already have a software interpreter don't delete it
-            if(dynamic_cast<sc::FormulaGroupInterpreterSoftware*>(msInstance))
+            if (bSwInterpreterEnabled && dynamic_cast<sc::FormulaGroupInterpreterSoftware*>(msInstance))
                 return true;
 
             delete msInstance;
+            msInstance = nullptr;
         }
 
-        msInstance = new sc::FormulaGroupInterpreterSoftware();
-        return true;
+        if (bSwInterpreterEnabled)
+        {
+            msInstance = new sc::FormulaGroupInterpreterSoftware();
+            return true;
+        }
+
+        return false;
     }
     bool bSuccess = ::opencl::switchOpenCLDevice(&rDeviceId, bAutoSelect, bForceEvaluation);
     if(!bSuccess)
@@ -527,7 +338,7 @@ bool FormulaGroupInterpreter::switchOpenCLDevice(const OUString& rDeviceId, bool
     delete msInstance;
     msInstance = nullptr;
 
-    if (ScCalcConfig::isOpenCLEnabled())
+    if (bOpenCLEnabled)
     {
         msInstance = new sc::opencl::FormulaGroupInterpreterOpenCL();
         return msInstance != nullptr;

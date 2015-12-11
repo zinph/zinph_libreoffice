@@ -16,6 +16,8 @@ else ifeq ($(ENABLE_TDE),TRUE)
 	brand_URIPARAM := --urls
 else ifeq ($(ENABLE_KDE4),TRUE)
 	brand_URIPARAM := --urls
+else ifeq ($(ENABLE_KDE5),TRUE)
+	brand_URIPARAM := --urls
 else
 	brand_URIPARAM :=
 endif

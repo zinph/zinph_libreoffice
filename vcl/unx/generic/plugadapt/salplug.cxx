@@ -99,7 +99,7 @@ static SalInstance* tryInstance( const OUString& rModuleBase, bool bForce = fals
                  * #i109007# KDE3 seems to have the same problem.
                  * And same applies for KDE4.
                  */
-                if( rModuleBase == "gtk" || rModuleBase == "gtk3" || rModuleBase == "tde" || rModuleBase == "kde" || rModuleBase == "kde4" )
+                if( rModuleBase == "gtk" || rModuleBase == "gtk3" || rModuleBase == "tde" || rModuleBase == "kde" || rModuleBase == "kde4" || rModuleBase == "kde5" )
                 {
                     pCloseModule = nullptr;
                 }
@@ -168,6 +168,9 @@ static SalInstance* autodetect_plugin()
     static const char* const pTDEFallbackList[] =
     {
         "tde",
+#if ENABLE_KDE5 && 0
+        "kde5",
+#endif
 #if ENABLE_KDE4
         "kde4",
 #endif
@@ -176,6 +179,9 @@ static SalInstance* autodetect_plugin()
 
     static const char* const pKDEFallbackList[] =
     {
+#if ENABLE_KDE5 && 0
+        "kde5",
+#endif
 #if ENABLE_KDE4
         "kde4",
 #endif

@@ -20,7 +20,7 @@ enum SalGenericDataType { SAL_DATA_GTK, SAL_DATA_GTK3,
                           SAL_DATA_TDE3, SAL_DATA_KDE3, SAL_DATA_KDE4,
                           SAL_DATA_UNX, SAL_DATA_SVP,
                           SAL_DATA_ANDROID, SAL_DATA_IOS,
-                          SAL_DATA_HEADLESS };
+                          SAL_DATA_HEADLESS, SAL_DATA_KDE5 };
 
 class VCL_DLLPUBLIC SalGenericData : public SalData
 {

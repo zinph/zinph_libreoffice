@@ -19,13 +19,20 @@
 
 #include "sal/config.h"
 
-#include "kde4access.hxx"
+#include "kde5access.hxx"
 
 #include <QtGui/QFont>
 #include <QtCore/QString>
-#include <kemailsettings.h>
-#include <kglobalsettings.h>
+#include <QtGui/QFontDatabase>
+#include <QtCore/QStandardPaths>
+#include <QtCore/QDir>
+#include <QtCore/QUrl>
+
 #include <kprotocolmanager.h>
+
+#include <kemailsettings.h>
+// #include <kglobalsettings.h>
+// #include <kprotocolmanager.h>
 
 #include "com/sun/star/uno/Any.hxx"
 #include "cppu/unotype.hxx"
@@ -38,7 +45,7 @@
 #define COMMA      ','
 #define SEMI_COLON ';'
 
-namespace kde4access {
+namespace kde5access {
 
 namespace {
 
@@ -65,7 +72,7 @@ css::beans::Optional< css::uno::Any > getValue(OUString const & id) {
         QFont aFixedFont;
         short nFontHeight;
 
-        aFixedFont = KGlobalSettings::fixedFont();
+        aFixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
         nFontHeight = aFixedFont.pointSize();
         return css::beans::Optional< css::uno::Any >(
             true, uno::makeAny( nFontHeight ) );
@@ -75,7 +82,7 @@ css::beans::Optional< css::uno::Any > getValue(OUString const & id) {
         QString aFontName;
         OUString sFontName;
 
-        aFixedFont = KGlobalSettings::fixedFont();
+        aFixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
         aFontName = aFixedFont.family();
         sFontName = reinterpret_cast<const sal_Unicode *>(aFontName.utf16());
         return css::beans::Optional< css::uno::Any >(
@@ -88,7 +95,8 @@ css::beans::Optional< css::uno::Any > getValue(OUString const & id) {
             true, uno::makeAny( OUString::boolean( ATToolSupport ) ) );
     } else if (id == "WorkPathVariable")
     {
-        QString aDocumentsDir( KGlobalSettings::documentPath() );
+        QString aDocumentsDir( QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) );
+        if (aDocumentsDir.isEmpty() ) aDocumentsDir = QDir::homePath();
         OUString sDocumentsDir;
         OUString sDocumentsURL;
         if ( aDocumentsDir.endsWith(QChar('/')) )
@@ -111,14 +119,14 @@ css::beans::Optional< css::uno::Any > getValue(OUString const & id) {
 // In such cases, the proxy address is not stored in KDE, but determined dynamically.
 // The proxy address may depend on the requested address, on the time of the day, on the speed of the wind...
 // The best we can do here is to ask the current value for a given address.
-            aFTPProxy = KProtocolManager::proxyForUrl( KUrl("ftp://ftp.libreoffice.org") );
+            aFTPProxy = KProtocolManager::proxyForUrl( QUrl("ftp://ftp.libreoffice.org") );
             break;
         default:                            // No proxy is used
             break;
         }
         if ( !aFTPProxy.isEmpty() )
         {
-            KUrl aProxy(aFTPProxy);
+            QUrl aProxy(aFTPProxy);
             OUString sProxy = reinterpret_cast<const sal_Unicode *>(aProxy.host().utf16());
             return css::beans::Optional< css::uno::Any >(
                 true, uno::makeAny( sProxy ) );
@@ -137,14 +145,14 @@ css::beans::Optional< css::uno::Any > getValue(OUString const & id) {
 // In such cases, the proxy address is not stored in KDE, but determined dynamically.
 // The proxy address may depend on the requested address, on the time of the day, on the speed of the wind...
 // The best we can do here is to ask the current value for a given address.
-            aFTPProxy = KProtocolManager::proxyForUrl( KUrl("ftp://ftp.libreoffice.org") );
+            aFTPProxy = KProtocolManager::proxyForUrl( QUrl("ftp://ftp.libreoffice.org") );
             break;
         default:                            // No proxy is used
             break;
         }
         if ( !aFTPProxy.isEmpty() )
         {
-            KUrl aProxy(aFTPProxy);
+            QUrl aProxy(aFTPProxy);
             sal_Int32 nPort = aProxy.port();
             return css::beans::Optional< css::uno::Any >(
                 true, uno::makeAny( nPort ) );
@@ -163,14 +171,14 @@ css::beans::Optional< css::uno::Any > getValue(OUString const & id) {
 // In such cases, the proxy address is not stored in KDE, but determined dynamically.
 // The proxy address may depend on the requested address, on the time of the day, on the speed of the wind...
 // The best we can do here is to ask the current value for a given address.
-            aHTTPProxy = KProtocolManager::proxyForUrl( KUrl("http://http.libreoffice.org") );
+            aHTTPProxy = KProtocolManager::proxyForUrl( QUrl("http://http.libreoffice.org") );
             break;
         default:                            // No proxy is used
             break;
         }
         if ( !aHTTPProxy.isEmpty() )
         {
-            KUrl aProxy(aHTTPProxy);
+            QUrl aProxy(aHTTPProxy);
             OUString sProxy = reinterpret_cast<const sal_Unicode *>(aProxy.host().utf16());
             return css::beans::Optional< css::uno::Any >(
                 true, uno::makeAny( sProxy ) );
@@ -189,14 +197,14 @@ css::beans::Optional< css::uno::Any > getValue(OUString const & id) {
 // In such cases, the proxy address is not stored in KDE, but determined dynamically.
 // The proxy address may depend on the requested address, on the time of the day, on the speed of the wind...
 // The best we can do here is to ask the current value for a given address.
-            aHTTPProxy = KProtocolManager::proxyForUrl( KUrl("http://http.libreoffice.org") );
+            aHTTPProxy = KProtocolManager::proxyForUrl( QUrl("http://http.libreoffice.org") );
             break;
         default:                            // No proxy is used
             break;
         }
         if ( !aHTTPProxy.isEmpty() )
         {
-            KUrl aProxy(aHTTPProxy);
+            QUrl aProxy(aHTTPProxy);
             sal_Int32 nPort = aProxy.port();
             return css::beans::Optional< css::uno::Any >(
                 true, uno::makeAny( nPort ) );
@@ -215,14 +223,14 @@ css::beans::Optional< css::uno::Any > getValue(OUString const & id) {
 // In such cases, the proxy address is not stored in KDE, but determined dynamically.
 // The proxy address may depend on the requested address, on the time of the day, on the speed of the wind...
 // The best we can do here is to ask the current value for a given address.
-            aHTTPSProxy = KProtocolManager::proxyForUrl( KUrl("https://https.libreoffice.org") );
+            aHTTPSProxy = KProtocolManager::proxyForUrl( QUrl("https://https.libreoffice.org") );
             break;
         default:                            // No proxy is used
             break;
         }
         if ( !aHTTPSProxy.isEmpty() )
         {
-            KUrl aProxy(aHTTPSProxy);
+            QUrl aProxy(aHTTPSProxy);
             OUString sProxy = reinterpret_cast<const sal_Unicode *>(aProxy.host().utf16());
             return css::beans::Optional< css::uno::Any >(
                 true, uno::makeAny( sProxy ) );
@@ -241,14 +249,14 @@ css::beans::Optional< css::uno::Any > getValue(OUString const & id) {
 // In such cases, the proxy address is not stored in KDE, but determined dynamically.
 // The proxy address may depend on the requested address, on the time of the day, on the speed of the wind...
 // The best we can do here is to ask the current value for a given address.
-            aHTTPSProxy = KProtocolManager::proxyForUrl( KUrl("https://https.libreoffice.org") );
+            aHTTPSProxy = KProtocolManager::proxyForUrl( QUrl("https://https.libreoffice.org") );
             break;
         default:                            // No proxy is used
             break;
         }
         if ( !aHTTPSProxy.isEmpty() )
         {
-            KUrl aProxy(aHTTPSProxy);
+            QUrl aProxy(aHTTPSProxy);
             sal_Int32 nPort = aProxy.port();
             return css::beans::Optional< css::uno::Any >(
                 true, uno::makeAny( nPort ) );

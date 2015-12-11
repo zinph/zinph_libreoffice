@@ -198,7 +198,15 @@ namespace
         {
             const OUString &rDesktopEnvironment = Application::GetDesktopEnvironment();
 
-            if ( rDesktopEnvironment.equalsIgnoreAsciiCase("kde4") )
+            if ( rDesktopEnvironment.equalsIgnoreAsciiCase("kde5") )
+            {
+                #if ENABLE_KDE5
+                return OUString("com.sun.star.ui.dialogs.KDE5FilePicker" );
+                #else
+                return OUString();
+                #endif
+            }
+            else if ( rDesktopEnvironment.equalsIgnoreAsciiCase("kde4") )
             {
                 #if ENABLE_KDE4
                 return OUString("com.sun.star.ui.dialogs.KDE4FilePicker" );

@@ -22,24 +22,46 @@ bool JvmfwkUtil_isLoadableJVM( OUString const & aURL )
         if ( pString )
         {
             NSURL *pURL = nil;
-
-            // Ignore all but Oracle's JDK as loading Apple's Java and Oracle's
-            // JRE will cause OS X's JavaVM framework to display a dialog and
-            // invoke exit() when loaded via JNI on OS X 10.10
             NSURL *pTmpURL = [NSURL URLWithString:pString];
+          #if MACOSX_SDK_VERSION >= 1060
             if ( pTmpURL )
-                pTmpURL = [pTmpURL filePathURL];
-            if ( pTmpURL )
-                pTmpURL = [pTmpURL URLByStandardizingPath];
-            if ( pTmpURL )
-                pTmpURL = [pTmpURL URLByResolvingSymlinksInPath];
+                pTmpURL = [pTmpURL filePathURL]; // pTmpURL = [NSURL URLWithString:[pTmpURL path]];
+          #endif
             if ( pTmpURL )
             {
+              #if MACOSX_SDK_VERSION < 1060
+                pTmpURL = [ NSURL URLWithString:[[pTmpURL path] stringByStandardizingPath] ];
+              #else
+                pTmpURL = [pTmpURL URLByStandardizingPath];
+              #endif
+            }
+            if ( pTmpURL )
+            {
+              #if MACOSX_SDK_VERSION < 1060
+                pTmpURL = [ NSURL URLWithString:[[pTmpURL path] stringByResolvingSymlinksInPath] ];
+              #else
+                pTmpURL = [pTmpURL URLByResolvingSymlinksInPath];
+              #endif
+            }
+            if ( pTmpURL )
+            {
+              #if MACOSX_SDK_VERSION >= 1080
                 NSURL *pJVMsDirURL = [NSURL URLWithString:@"file:///Library/Java/JavaVirtualMachines/"];
+              #else
+                NSURL *pJVMsDirURL = [NSURL URLWithString:@"file:///System/Library/Frameworks/JavaVM.framework/Versions/"];
+              #endif
+              #if MACOSX_SDK_VERSION >= 1060
                 if ( pJVMsDirURL )
-                    pJVMsDirURL= [pJVMsDirURL filePathURL];
+                    pJVMsDirURL = [pJVMsDirURL filePathURL]; // pJVMsDirURL = [NSURL URLWithString:[pJVMsDirURL path]];
+              #endif
                 if ( pJVMsDirURL )
+                {
+                  #if MACOSX_SDK_VERSION < 1060
+                    pJVMsDirURL = [ NSURL URLWithString:[[pJVMsDirURL path] stringByStandardizingPath] ];
+                  #else
                     pJVMsDirURL = [pJVMsDirURL URLByStandardizingPath];
+                  #endif
+                }
                 // The JVM directory must not contain softlinks or the JavaVM
                 // framework bug will occur so don't resolve softlinks in the
                 // JVM directory
@@ -56,14 +78,20 @@ bool JvmfwkUtil_isLoadableJVM( OUString const & aURL )
                 }
             }
 
+#if MACOSX_SDK_VERSION >= 1080
             while ( pURL )
             {
                 // Check if this is a valid bundle
-                NSNumber *pDir = nil;
-                NSURL *pContentsURL = [pURL URLByAppendingPathComponent:@"Contents"];
-                if ( pContentsURL && [pContentsURL getResourceValue:&pDir forKey:NSURLIsDirectoryKey error:nil] && pDir && [pDir boolValue] )
+                NSURL *pContentsURL = nil;
+              ///#if MACOSX_SDK_VERSION < 1060
+                ///pContentsURL = [NSURL URLWithString:[[pURL path] stringByAppendingPathComponent:@"Contents"]];
+              ///#else
+                pContentsURL = [pURL URLByAppendingPathComponent:@"Contents"];
+              ///#endif
+                BOOL isDir = NO;
+                if ( pContentsURL && [[NSFileManager defaultManager] fileExistsAtPath:[pContentsURL path] isDirectory:&isDir] && isDir )
                 {
-                    NSBundle *pBundle = [NSBundle bundleWithURL:pURL];
+                    NSBundle *pBundle = [NSBundle bundleWithPath:[pURL path]];
                     if ( pBundle )
                     {
                         // Make sure that this bundle's Info.plist has the
@@ -110,18 +138,22 @@ bool JvmfwkUtil_isLoadableJVM( OUString const & aURL )
                 }
 
                 NSURL *pOldURL = pURL;
-                pURL = [pURL URLByDeletingLastPathComponent];
+                pURL = [pURL URLByDeletingLastPathComponent]; // pURL = [ NSURL URLWithString:[[pURL path] stringByDeletingLastPathComponent] ];
                 if ( pURL )
                 {
-                    pURL = [pURL URLByStandardizingPath];
+                    pURL = [pURL URLByStandardizingPath]; // pURL = [ NSURL URLWithString:[[pURL path] stringByStandardizingPath] ];
                     if ( pURL )
                     {
-                        pURL = [pURL URLByResolvingSymlinksInPath];
+                        pURL = [pURL URLByResolvingSymlinksInPath]; // pURL = [ NSURL URLWithString:[[pURL path] stringByResolvingSymlinksInPath] ];
                         if ( pURL && [pURL isEqual:pOldURL] )
                             pURL = nil;
                     }
                 }
             }
+#else // i.e. MACOSX_SDK_VERSION < 1080
+            if ( pURL )
+                bRet = true;
+#endif
         }
 
         [pPool release];

@@ -68,8 +68,7 @@ using ::rtl::Reference;
 #define HKEY_SUN_SDK L"Software\\JavaSoft\\Java Development Kit"
 #endif
 
-#ifdef UNX
-#if !(defined MACOSX && defined X86_64)
+#if defined( UNX ) && !defined( MACOSX )
 namespace {
 char const *g_arJavaNames[] = {
     "",
@@ -82,6 +81,7 @@ char const *g_arJavaNames[] = {
     "Home",
     "IBMJava2-ppc-142"
 };
+
 /* These are directory names which could contain multiple java installations.
  */
 char const *g_arCollectDirs[] = {
@@ -101,11 +101,6 @@ char const *g_arCollectDirs[] = {
    looked for.
 */
 char const *g_arSearchPaths[] = {
-#ifdef MACOSX
-    "",
-    "Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin",
-    "System/Library/Frameworks/JavaVM.framework/Versions/1.4.2/"
-#else
 #ifndef JVM_ONE_PATH_CHECK
     "",
     "usr/",
@@ -120,11 +115,9 @@ char const *g_arSearchPaths[] = {
 #else
     JVM_ONE_PATH_CHECK
 #endif
-#endif
 };
 }
-#endif
-#endif //  UNX
+#endif //  UNX && !MACOSX
 
 namespace jfw_plugin
 {
@@ -1204,10 +1197,16 @@ void addJavaInfosDirScan(
     std::vector<rtl::Reference<VendorBase>> & addedInfos)
 {
 #ifdef MACOSX
+#if MACOSX_SDK_VERSION >= 1080
     // Ignore all but Oracle's JDK as loading Apple's Java and Oracle's JRE
     // will cause OS X's JavaVM framework to display a dialog and invoke
     // exit() when loaded via JNI on OS X 10.10
     Directory aDir("file:///Library/Java/JavaVirtualMachines");
+#else
+    // For Java versions 6 and below, Apple supplies their own version of Java,
+    // so it's under /System and not /Library
+    Directory aDir("file:///System/Library/Frameworks/JavaVM.framework/Versions");
+#endif
     if (aDir.open() == File::E_None)
     {
         DirectoryItem aItem;
@@ -1219,9 +1218,16 @@ void addJavaInfosDirScan(
                 OUString aItemURL( aStatus.getFileURL() );
                 if (aItemURL.getLength())
                 {
+                #if MACOSX_SDK_VERSION >= 1080
                     aItemURL += "/Contents/Home";
+                #else
+                    aItemURL += "/Home";
+                #endif
                     if (DirectoryItem::get(aItemURL, aItem) == File::E_None)
-                        getAndAddJREInfoByPath(aItemURL, allInfos, addedInfos);
+                    {
+                        bool success = getAndAddJREInfoByPath(aItemURL, allInfos, addedInfos);
+                        JFW_TRACE2( ">>getAndAddJREInfoByPath<< returned " << ( success ? "TRUE" : "FALSE" ) );
+                    }
                 }
             }
         }

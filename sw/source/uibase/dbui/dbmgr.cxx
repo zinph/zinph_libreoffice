@@ -1025,8 +1025,13 @@ bool SwDBManager::MergeMailFiles(SwWrtShell* pSourceShell,
             if (bCreateSingleFile)
             {
                 CreateTargetDocShell(nMaxDumpDocs, bMergeShell, pSourceWindow, pSourceShell,
-                        pSourceDocSh, xTargetDocShell, pTargetDoc, pTargetShell,
-                        pTargetView, nStartingPageNo, sStartingPageDesc);
+                        pSourceDocSh, xTargetDocShell, pTargetDoc,
+                        pTargetShell, pTargetView);
+
+                // determine the page style and number used at the start of the source document
+                pSourceShell->SttEndDoc(true);
+                nStartingPageNo = pSourceShell->GetVirtPageNum();
+                sStartingPageDesc = pSourceShell->GetPageDesc(pSourceShell->GetCurPageDesc()).GetName();
 
                 // #i72517#
                 const SwPageDesc* pSourcePageDesc = pSourceShell->FindPageDescByName(sStartingPageDesc);
@@ -1388,12 +1393,6 @@ SwView* SwDBManager::CreateTargetDocShell(bool bMergeShell, vcl::Window *pSource
 
     //copy the styles from the source to the target document
     pTargetView->GetDocShell()->_LoadStyles( *pSourceDocSh, true );
-
-    //determine the page style and number used at the start of the source document
-    pSourceShell->SttEndDoc(true);
-    nStartingPageNo = pSourceShell->GetVirtPageNum();
-    sStartingPageDesc = pSourceShell->GetPageDesc(
-        pSourceShell->GetCurPageDesc()).GetName();
 
     // copy compatibility options
     pTargetShell->GetDoc()->ReplaceCompatibilityOptions( *pSourceShell->GetDoc());

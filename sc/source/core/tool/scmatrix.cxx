@@ -3434,11 +3434,10 @@ ScMatrix::IterateResult ScVectorRefMatrix::Sum(bool bTextAsZero) const
                 }
             }
             p += i;
-            nDataSize -= i;
-            if (nDataSize == 0)
+            if (i == nDataSize)
                 continue;
 
-            sc::ArraySumFunctor functor(p, nDataSize);
+            sc::ArraySumFunctor functor(p, nDataSize-i);
 
             mfRest += functor();
         }

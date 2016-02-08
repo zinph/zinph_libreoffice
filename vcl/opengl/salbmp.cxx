@@ -898,4 +898,52 @@ bool OpenGLSalBitmap::Replace( const Color& rSearchColor, const Color& rReplaceC
     return true;
 }
 
+// Convert texture to greyscale and adjust bitmap metadata
+bool OpenGLSalBitmap::ConvertToGreyscale()
+{
+    VCL_GL_INFO("::ConvertToGreyscale");
+
+    if (false)
+        return false;
+
+    OpenGLZone aZone;
+    rtl::Reference<OpenGLContext> xContext = OpenGLContext::getVCLContext();
+
+    OpenGLFramebuffer* pFramebuffer;
+    OpenGLProgram* pProgram;
+
+    GetTexture();
+    pProgram = xContext->UseProgram("textureVertexShader", "greyscaleFragmentShader");
+
+    if (!pProgram)
+        return false;
+
+    OpenGLTexture aNewTex(mnWidth, mnHeight);
+    pFramebuffer = xContext->AcquireFramebuffer(aNewTex);
+    pProgram->ApplyMatrix(mnWidth, mnHeight);
+    pProgram->SetTexture("sampler", maTexture);
+    pProgram->DrawTexture(maTexture);
+    pProgram->Clean();
+
+    OpenGLContext::ReleaseFramebuffer( pFramebuffer );
+    maTexture = aNewTex;
+    mnBits = 8;
+
+    static BitmapPalette aGreyPalette256;
+    if (!aGreyPalette256.GetEntryCount())
+    {
+        aGreyPalette256.SetEntryCount(256);
+
+        for (sal_uInt16 i = 0; i < 256; i++)
+        {
+            sal_uInt8 nValue = sal_uInt8(i);
+            aGreyPalette256[i] = BitmapColor(nValue, nValue, nValue);
+        }
+    }
+    maPalette = aGreyPalette256;
+
+    CHECK_GL_ERROR();
+    return true;
+}
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

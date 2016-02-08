@@ -259,8 +259,6 @@ bool Bitmap::Convert( BmpConversion eConversion )
         {
             ImplSetImpBitmap(pImpBmp);
             SAL_INFO( "vcl.opengl", "Ref count: " << mpImpBmp->ImplGetRefCount() );
-            //maPrefMapMode = MapMode(MAP_PIXEL);
-            //maPrefSize = pImpBmp->ImplGetSize();
             return true;
         }
         else

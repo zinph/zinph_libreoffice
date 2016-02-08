@@ -903,7 +903,8 @@ bool OpenGLSalBitmap::ConvertToGreyscale()
 {
     VCL_GL_INFO("::ConvertToGreyscale");
 
-    if (false)
+    // avoid re-converting to 8bits.
+    if ( mnBits == 8 && maPalette == Bitmap::GetGreyPalette(256) )
         return false;
 
     OpenGLZone aZone;
@@ -920,7 +921,6 @@ bool OpenGLSalBitmap::ConvertToGreyscale()
 
     OpenGLTexture aNewTex(mnWidth, mnHeight);
     pFramebuffer = xContext->AcquireFramebuffer(aNewTex);
-    pProgram->ApplyMatrix(mnWidth, mnHeight);
     pProgram->SetTexture("sampler", maTexture);
     pProgram->DrawTexture(maTexture);
     pProgram->Clean();
@@ -928,19 +928,7 @@ bool OpenGLSalBitmap::ConvertToGreyscale()
     OpenGLContext::ReleaseFramebuffer( pFramebuffer );
     maTexture = aNewTex;
     mnBits = 8;
-
-    static BitmapPalette aGreyPalette256;
-    if (!aGreyPalette256.GetEntryCount())
-    {
-        aGreyPalette256.SetEntryCount(256);
-
-        for (sal_uInt16 i = 0; i < 256; i++)
-        {
-            sal_uInt8 nValue = sal_uInt8(i);
-            aGreyPalette256[i] = BitmapColor(nValue, nValue, nValue);
-        }
-    }
-    maPalette = aGreyPalette256;
+    maPalette = Bitmap::GetGreyPalette(256);
 
     CHECK_GL_ERROR();
     return true;

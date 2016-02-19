@@ -410,12 +410,20 @@ bool PageSyncData::PlaySyncPageAct( PDFWriter& rWriter, sal_uInt32& rCurGDIMtfAc
                         if ( rOutDevData.GetIsLosslessCompression() && !rOutDevData.GetIsReduceImageResolution() )
                         {
                             Graphic& rGraphic = mGraphics.front();
-                            if ( rGraphic.IsLink() && rGraphic.GetLink().GetType() == GFX_LINK_TYPE_NATIVE_JPG )
+                            if ( rGraphic.IsLink() )
                             {
-                                mbGroupIgnoreGDIMtfActions = true;
+                                GfxLinkType eType = rGraphic.GetLink().GetType();
+                                if ( eType == GFX_LINK_TYPE_NATIVE_JPG )
+                                {
+                                    mbGroupIgnoreGDIMtfActions = true;
+                                    if ( !mbGroupIgnoreGDIMtfActions )
+                                        mCurrentGraphic = rGraphic;
+                                }
+                                else if ( eType == GFX_LINK_TYPE_NATIVE_PNG )
+                                {
+                                    mCurrentGraphic = rGraphic;
+                                }
                             }
-                            if ( !mbGroupIgnoreGDIMtfActions )
-                                mCurrentGraphic = rGraphic;
                         }
                         break;
                     }
@@ -470,10 +478,7 @@ bool PageSyncData::PlaySyncPageAct( PDFWriter& rWriter, sal_uInt32& rCurGDIMtfAc
                     }
                     mbGroupIgnoreGDIMtfActions = false;
                 }
-                else
-                {
-                    mCurrentGraphic.Clear();
-                }
+                mCurrentGraphic.Clear();
             }
             break;
             case PDFExtOutDevDataSync::CreateNamedDest:

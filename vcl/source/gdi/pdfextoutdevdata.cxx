@@ -294,7 +294,7 @@ struct PageSyncData
     std::deque< PDFWriter::StructAttribute >        mParaStructAttributes;
     std::deque< PDFWriter::StructAttributeValue >   mParaStructAttributeValues;
     std::deque< Graphic >                           mGraphics;
-    Graphic*                                        mpCurrentGraphic;
+    Graphic                                         mCurrentGraphic;
     std::deque< std::shared_ptr< PDFWriter::AnyWidget > >
                                                     mControls;
     GlobalSyncData*                                 mpGlobalData;
@@ -303,8 +303,7 @@ struct PageSyncData
 
 
     explicit PageSyncData( GlobalSyncData* pGlobal )
-        : mpCurrentGraphic ( nullptr )
-        , mbGroupIgnoreGDIMtfActions ( false )
+        : mbGroupIgnoreGDIMtfActions ( false )
     { mpGlobalData = pGlobal; }
 
     void PushAction( const OutputDevice& rOutDev, const PDFExtOutDevDataSync::Action eAct );
@@ -415,7 +414,8 @@ bool PageSyncData::PlaySyncPageAct( PDFWriter& rWriter, sal_uInt32& rCurGDIMtfAc
                             {
                                 mbGroupIgnoreGDIMtfActions = true;
                             }
-                            mpCurrentGraphic = mbGroupIgnoreGDIMtfActions ? nullptr : &rGraphic;
+                            if ( !mbGroupIgnoreGDIMtfActions )
+                                mCurrentGraphic = rGraphic;
                         }
                         break;
                     }
@@ -472,7 +472,7 @@ bool PageSyncData::PlaySyncPageAct( PDFWriter& rWriter, sal_uInt32& rCurGDIMtfAc
                 }
                 else
                 {
-                    mpCurrentGraphic = nullptr;
+                    mCurrentGraphic.Clear();
                 }
             }
             break;
@@ -526,9 +526,9 @@ PDFExtOutDevData::~PDFExtOutDevData()
     delete mpGlobalSyncData;
 }
 
-const Graphic* PDFExtOutDevData::GetCurrentGraphic() const
+Graphic PDFExtOutDevData::GetCurrentGraphic() const
 {
-    return mpPageSyncData->mpCurrentGraphic;
+    return mpPageSyncData->mCurrentGraphic;
 }
 
 void PDFExtOutDevData::SetDocumentLocale( const css::lang::Locale& rLoc )

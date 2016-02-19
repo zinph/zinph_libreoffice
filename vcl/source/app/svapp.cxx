@@ -524,7 +524,7 @@ inline bool ImplYield(bool i_bWait, bool i_bAllEvents, sal_uLong const nReleased
 
     SAL_INFO("vcl.schedule", "Leave ImplYield");
 
-    return bHasActiveIdles;
+    return bHasActiveIdles || eResult == SalYieldResult::EVENT;
 }
 
 void Application::Reschedule( bool i_bAllEvents )
